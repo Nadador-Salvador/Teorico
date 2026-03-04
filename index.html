@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#1A1208" />
+  <title>Nadador Salvador – Exame Teórico</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0F0A04; --surface: #1A1208; --card: #221A0A; --border: #3A2A12;
+      --orange: #F06A1A; --amber: #F5A623; --yellow: #FBBF24;
+      --text: #FAF0DC; --muted: #8A7055; --success: #22C55E; --error: #EF4444;
+      --radius: 14px; --font: 'Outfit', sans-serif;
+    }
+    html, body, #root { min-height: 100vh; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); font-size: 16px; -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
+    .app { min-height: 100vh; display: flex; flex-direction: column; }
+    .nav { display: flex; align-items: center; justify-content: center; padding: 14px 16px; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+    .nav-logo { display: flex; align-items: center; gap: 10px; font-size: 1rem; font-weight: 700; }
+    .nav-logo-icon { width: 36px; height: 36px; background: var(--orange); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+    .main { flex: 1; padding: 20px 16px 48px; max-width: 600px; margin: 0 auto; width: 100%; }
+    .home-hero { text-align: center; padding: 32px 0 24px; }
+    .home-wave { font-size: 3.2rem; margin-bottom: 12px; }
+    .home-title { font-size: 1.8rem; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(135deg, var(--orange), var(--yellow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 4px; }
+    .home-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 28px; line-height: 1.5; padding: 0 8px; }
+    .home-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .home-cards .mode-card:last-child:nth-child(odd) { grid-column: 1 / -1; }
+    @media(max-width: 380px) { .home-cards { grid-template-columns: 1fr; } .home-cards .mode-card:last-child:nth-child(odd) { grid-column: auto; } }
+    .mode-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 16px; cursor: pointer; transition: border-color .15s; text-align: left; }
+    .mode-card:active { border-color: var(--orange); background: #2A1E0A; }
+    .mode-card-icon { font-size: 1.8rem; margin-bottom: 10px; }
+    .mode-card-title { font-size: 1rem; font-weight: 700; margin-bottom: 5px; }
+    .mode-card-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
+    .stats-bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 13px 16px; font-size: 0.83rem; color: var(--muted); }
+    .stat { display: flex; align-items: center; gap: 5px; }
+    .stat-val { color: var(--amber); font-weight: 700; }
+    .section-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 4px; }
+    .section-sub { color: var(--muted); font-size: 0.85rem; margin-bottom: 18px; line-height: 1.5; }
+    .chapter-list { display: flex; flex-direction: column; gap: 9px; }
+    .chapter-item { display: flex; align-items: center; justify-content: space-between; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 15px 16px; cursor: pointer; transition: border-color .15s; min-height: 64px; }
+    .chapter-item:active { border-color: var(--orange); background: #2A1E0A; }
+    .chapter-item-left { display: flex; align-items: center; gap: 12px; }
+    .chapter-num { width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0; background: linear-gradient(135deg, var(--orange), var(--amber)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; color: #fff; }
+    .chapter-name { font-size: 0.92rem; font-weight: 500; }
+    .chapter-count { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+    .chapter-arrow { color: var(--muted); font-size: 1.3rem; }
+    .quiz-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .quiz-progress-text { font-size: 0.8rem; color: var(--muted); }
+    .quiz-progress-num { font-size: 1.05rem; font-weight: 700; color: var(--amber); }
+    .quiz-timer { display: flex; align-items: center; gap: 6px; background: var(--card); border: 1px solid var(--border); border-radius: 9px; padding: 8px 14px; font-weight: 700; font-size: 0.95rem; min-height: 44px; }
+    .quiz-timer.warning { color: var(--error); border-color: var(--error); }
+    .progress-bar { height: 4px; background: var(--border); border-radius: 99px; margin-bottom: 20px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--orange), var(--yellow)); transition: width .4s ease; }
+    .question-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 14px; }
+    .question-label { font-size: 0.72rem; color: var(--amber); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .question-text { font-size: 1rem; font-weight: 500; line-height: 1.65; }
+    .options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+    .option-btn { display: flex; align-items: center; gap: 13px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; cursor: pointer; transition: border-color .13s, background .13s; text-align: left; width: 100%; font-family: var(--font); color: var(--text); font-size: 0.93rem; min-height: 58px; line-height: 1.4; }
+    .option-btn:active:not(:disabled) { border-color: var(--amber); background: #2A1E0A; }
+    .option-btn.selected { border-color: var(--orange); background: #2E1A08; }
+    .option-btn.correct { border-color: var(--success); background: #0D2E1A; }
+    .option-btn.wrong { border-color: var(--error); background: #2E0D0D; }
+    .option-btn:disabled { cursor: default; }
+    .option-letter { width: 30px; height: 30px; border-radius: 7px; flex-shrink: 0; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.82rem; font-weight: 700; transition: background .13s; }
+    .option-btn.selected .option-letter { background: var(--orange); color: #fff; }
+    .option-btn.correct .option-letter { background: var(--success); color: #fff; }
+    .option-btn.wrong .option-letter { background: var(--error); color: #fff; }
+    .feedback { border-radius: var(--radius); padding: 13px 16px; font-size: 0.92rem; font-weight: 500; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; line-height: 1.4; }
+    .feedback.correct { background: #0D2E1A; border: 1px solid var(--success); color: #4ADE80; }
+    .feedback.wrong { background: #2E0D0D; border: 1px solid var(--error); color: #F87171; }
+    .quiz-actions { display: flex; justify-content: flex-end; gap: 10px; }
+    .btn { padding: 14px 22px; border-radius: 12px; font-family: var(--font); font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all .15s; border: none; display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 50px; }
+    .btn-primary { background: var(--orange); color: #fff; }
+    .btn-primary:active { background: #d45a14; transform: scale(0.97); }
+    .btn-secondary { background: var(--card); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:active { border-color: var(--orange); }
+    .btn-sm { padding: 9px 14px; font-size: 0.83rem; min-height: 40px; border-radius: 9px; }
+    .btn:disabled { opacity: 0.4; cursor: default; transform: none !important; }
+    .results-hero { text-align: center; padding: 24px 0; }
+    .results-score { font-size: 4rem; font-weight: 800; letter-spacing: -2px; background: linear-gradient(135deg, var(--orange), var(--yellow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .results-label { color: var(--muted); font-size: 0.85rem; margin-bottom: 4px; }
+    .results-verdict { font-size: 1.15rem; font-weight: 700; margin-top: 6px; }
+    .results-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin: 18px 0; }
+    .result-stat { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; text-align: center; }
+    .result-stat-val { font-size: 1.6rem; font-weight: 800; }
+    .result-stat-label { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+    .review-title { font-size: 0.95rem; font-weight: 700; margin: 20px 0 10px; }
+    .review-item { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 9px; }
+    .review-q { font-size: 0.9rem; font-weight: 500; margin-bottom: 10px; line-height: 1.55; }
+    .review-answer { font-size: 0.83rem; padding: 7px 10px; border-radius: 7px; display: flex; align-items: flex-start; gap: 6px; margin-bottom: 4px; line-height: 1.45; }
+    .review-answer.correct { background: #0D2E1A; color: #4ADE80; }
+    .review-answer.wrong { background: #2E0D0D; color: #F87171; }
+    .chapter-select-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 20px; }
+    @media(max-width: 380px) { .chapter-select-grid { grid-template-columns: 1fr; } }
+    .chapter-select-item { display: flex; align-items: center; gap: 11px; background: var(--card); border: 2px solid var(--border); border-radius: var(--radius); padding: 13px; cursor: pointer; transition: border-color .15s; user-select: none; min-height: 64px; }
+    .chapter-select-item:active { border-color: var(--orange); }
+    .chapter-select-item.selected { border-color: var(--orange); background: #2E1A08; }
+    .chapter-select-check { width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; transition: all .15s; }
+    .chapter-select-item.selected .chapter-select-check { background: var(--orange); border-color: var(--orange); color: #fff; }
+    .chapter-select-name { font-size: 0.85rem; font-weight: 500; line-height: 1.3; }
+    .chapter-select-count { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+    .select-actions { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+    .select-hint { font-size: 0.85rem; color: var(--muted); }
+    .select-hint span { color: var(--amber); font-weight: 600; }
+    .warning-box { background: #2E1A08; border: 1px solid var(--amber); border-radius: var(--radius); padding: 12px 16px; font-size: 0.85rem; color: var(--amber); margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+  const { useState, useEffect, useRef } = React;
+
+  const CHAPTERS = [
+    "Capítulo 1 – O Instituto de Socorros a Náufragos",
+    "Capítulo 2 – Ser Nadador Salvador",
+    "Capítulo 3 – O Afogamento",
+    "Capítulo 4 – Praias",
+    "Capítulo 5 – Piscinas",
+    "Capítulo 6 – O Salvamento",
+    "Capítulo 7 – Socorro ao Náufrago",
+    "Capítulo 8 – Acidente Frequentes em Praias e Piscinas",
+    "Capítulo 9 – Perguntas Extra"
+  ];
+
+  const QUESTIONS = [
+    {"chapter":0,"text":"Em 1800, em que cidade Portuguesa surge a primeira embarcação salvavidas?","options":["Faro","Lisboa","Porto","Aveiro"],"correct":2},
+    {"chapter":0,"text":"Em que ano se realizou o primeiro curso de Nadador-Salvador (NS) em Portugal?","options":["1955","1956","1909","2000"],"correct":1},
+    {"chapter":0,"text":"Em que ano o Real Instituto Socorros a Náufragos (RISN) criou o primeiro serviço de assistência a banhistas nas praias?","options":["1910","1909","1957","1892"],"correct":1},
+    {"chapter":0,"text":"Em que ano o Instituto de Socorros a Náufragos (ISN) se tornou membro fundador da International Life Saving Federation (ILS)?","options":["1995","1998","2000","1993"],"correct":3},
+    {"chapter":0,"text":"O Instituto Socorros a Náufragos (ISN), assegura o reconhecimento e certificação nos seguintes domínios da atividade do Nadador-Salvador (NS):","options":["Nadador-Salvador (NS)","Cursos e entidades formadoras","Material e equipamento","Todas as respostas estão corretas"],"correct":3},
+    {"chapter":0,"text":"Qual o órgão regulador a nível Nacional na estrutura da Autoridade Marítima Nacional (AMN), competente para o reconhecimento das qualificações profissionais, no âmbito da profissão regulamentada prevista na alínea b) do nº1 do artigo 2º, da portaria 88/2012 de 30 de março.","options":["Instituto Socorros a Náufragos (ISN)","Direção-Geral da Autoridade Marítima (DGAM)","Polícia Marítima (PM)","Escola de Autoridade Marítima (EAM)"],"correct":0},
+    {"chapter":0,"text":"Em que ano foi criado o Real Instituto de Socorros a Náufragos (RISN) e por quem?","options":["Em 1883, pelo Rei D. Carlos","Em 1892, pela Rainha D. Amélia","Em 1901, pelo Rei D. Carlos","Em 1910, pela Rainha D. Amélia"],"correct":1},
+    {"chapter":0,"text":"O Real Instituto de Socorros a Náufragos (RISN), foi criado pela:","options":["Rainha D. Amélia","Rainha D. Amália","Rainha D. Leonor","Rainha D. Beatriz"],"correct":0},
+    {"chapter":0,"text":"Em que ano, o Real Instituto de Socorros a Náufragos (RISN), passou a designar-se pelo atual nome, Instituto de Socorros a Náufragos (ISN)?","options":["Em 1910","Em 1892","Em 1990","Em 1882"],"correct":0},
+    {"chapter":0,"text":"Atualmente, o Instituto de Socorros a Náufragos (ISN), é um organismo de que estrutura?","options":["Direção-Geral da Autoridade Marítima (DGAM)","Direção Geral de Viação (DGV)","Direção da Defesa Nacional (DDN)","Autoridade Nacional de Proteção Civil (ANPC)"],"correct":0},
+    {"chapter":0,"text":"Em que praia portuguesa, o Real Instituto de Socorros a Náufragos (RISN), criou o primeiro serviço de assistência a banhistas?","options":["Na praia da Trafaria","Na praia de Caxias","Na praia de Albufeira","Na praia de Algés."],"correct":0},
+    {"chapter":0,"text":"O ano de 1995 foi particularmente importante para a segurança nas praias, atendendo que nesse ano, surgiram novos meios de salvamento aquático, nomeadamente:","options":["O cinto de Salvamento","A boia torpedo","A prancha de salvamento","Todas as respostas estão certas"],"correct":3},
+    {"chapter":0,"text":"Compete ao Instituto de Socorros a Náufragos (ISN):","options":["Autuar os concessionários quando o material do posto de praia não se encontre em perfeitas condições de utilização;","Celebrar contratos de Nadador-Salvador (NS);","Informar as entidades requerentes sobre a organização do respetivo processo de certificação;","Todas as respostas estão corretas."],"correct":2},
+    {"chapter":0,"text":"Qual a entidade que compete promover as ações necessárias para a avaliação externa do sistema?","options":["Autoridade Marítima Nacional (AMN)","Instituto de Socorros a Náufragos (ISN)","Associações Nadadores–Salvadores (ANS)","Capitanias locais"],"correct":1},
+    {"chapter":0,"text":"O Instituto de Socorros a Náufragos (ISN) é responsável pela doutrina da assistência a banhistas, certificando os Nadadores-Salvadores (NS) para:","options":["A prestação da assistência a banhistas nas piscinas privadas","A prestação de socorro a nível nacional e internacional","A prestação da assistência a banhistas nos espaços aquáticos a nível nacional","A nível nacional a prestação de socorro e assistência a banheiros"],"correct":2},
+    {"chapter":0,"text":"A quem compete definir as especificações técnicas dos materiais e equipamentos destinados às atividades de informação, apoio, vigilância, segurança, socorro a náufragos e salvamento prestado a banhistas?","options":["À Autoridade Marítima Local","Às autoridades Locais","Ao Instituto de Socorros a Náufragos (ISN)","À Capitania do Porto"],"correct":2},
+    {"chapter":0,"text":"Ao abrigo da Lei n.º 68/2014 artigo 32.º, atividade de Nadador-Salvador (NS) está sujeita a controlo e fiscalizações técnicas periódicas, são da competência de:","options":["Autoridade Marítima Nacional (AMN), Polícia Marítima (PM) e Guarda Nacional Republicana (GNR)","Órgão Local Autoridade Marítima Nacional, Instituto de Socorros a Náufragos (ISN) e Agência Portuguesa do Ambiente (APA)","Autoridade Marítima Nacional (AMN), Instituto de Socorros a Náufragos (ISN) e Polícia Segurança Pública (PSP)","Autoridade Marítima Nacional (AMN), Guarda Nacional Republicana (GNR) e Agência Portuguesa do Ambiente (APA)"],"correct":1},
+    {"chapter":0,"text":"O Decreto-Lei n.º 96-A/2006 de 2 de junho, aprovou o regime contraordenacional. A não participação de acidentes na Zona de Assistência a Banhistas (ZAB) à autoridade marítima no prazo de 24 horas, é punível com:","options":["Coima de 100€ a 1000€ a pagar pelo Nadador-Salvador (NS)","Coima de 100€ a 1000€ a pagar pelo titular da licença da Zona de Assistência a Banhistas (ZAB)","Coima de 250€ a 2500€ a pagar pelo Nadador-Salvador (NS)","Coima de 250€ a 2500€ a pagar pelo titular de licença ou concessões de Zona de Assistência a Banhistas (ZAB)"],"correct":3},
+    {"chapter":0,"text":"A atividade de Nadador-Salvador (NS) está sujeita a controlo e fiscalizações técnicas periódicas, a efetuar por?","options":["Autoridade Marítima Nacional (AMN)","Instituto de Socorros a Náufragos (ISN)","Agência Portuguesa do Ambiente (APA)","Todas as respostas estão corretas"],"correct":3},
+    {"chapter":0,"text":"Qual a lei ou decreto-lei, que define o regime jurídico do exercício da atividade e aprova o regulamento da atividade de Nadador-Salvador (NS)?","options":["Decreto-Lei n.º 96-A/2006 de 02 de junho","Lei n.º 68/2014 de 29 de agosto","Decreto-Lei n.º 16/2008 de 26 de agosto","Lei n.º 44/2004 de 19 de agosto"],"correct":1},
+    {"chapter":0,"text":"Constitui contraordenação punível com coima de 100 a 1000€, o seguinte ato praticado pelo Nadador-Salvador (NS):","options":["Afastamento injustificado da área de vigilância e socorro, durante o horário de serviço","Não efetuar uma inspeção aos meios de salvamento do posto de praia","Içar a bandeira vermelha sem autorização da Polícia Marítima (PM)","Não usar os pés de pato durante um salvamento"],"correct":0},
+    {"chapter":0,"text":"O Nadador-Salvador (NS) afasta-se injustificadamente da área de vigilância e socorro, durante o horário de serviço?","options":["Constitui uma contraordenação punível com coima de 50€ a 1000€","Constitui uma contraordenação punível com coima de 100€ a 1000€","Constitui uma contraordenação punível com coima de 50€ a 250€","Constitui um crime punível com prisão até 30 dias"],"correct":1},
+    {"chapter":0,"text":"Não estar devidamente uniformizado, o Nadador-Salvador (NS) incorre numa:","options":["Contraordenação punível com coima de 50 a 1000 euros","Contraordenação punível com coima de 100 a 1000 euros","Contraordenação punível com coima de 50 a 250 euros","Crime punível com prisão ate 30 dias"],"correct":1},
+    {"chapter":0,"text":"Qual a portaria que aprova o Regulamento de Uniformes do Nadador-Salvador (NS)?","options":["Portaria nº 311/2015 de 1 de outubro","Portaria n.º 321/2015 de 1 de outubro","Portaria nº 321/2012 de 1 de outubro","Portaria nº 311/2012 de 1 de outubro"],"correct":1},
+    {"chapter":0,"text":"O que se entende por frente de praia?","options":["A ocupação de areal para banhos com a maré cheia","São praias qualificadas como tal com diploma legal","O comprimento da faixa de areal sujeita a ocupação balnear","A largura da ocupação balnear"],"correct":2},
+    {"chapter":0,"text":"Atendendo a uma Unidade Balnear (UB) com uma frente de praia de 200 metros, qual o dispositivo de segurança que deverá existir de acordo com a Lei n.º 68/2014 de 29 de agosto?","options":["Quatro Nadadores-Salvadores (NS) e dois postos de praia","Um Nadador-Salvador (NS) para cada posto de praia","Três Nadadores-Salvadores (NS) e dois postos de praia","Dois Nadadores-Salvadores (NS) e dois postos de praia"],"correct":0},
+    {"chapter":0,"text":"Qual a entidade com competências para certificar ou reconhecer o nadador-salvador profissional?","options":["Autoridade Marítima Nacional (AMN)","Instituto de Socorros a Náufragos (ISN)","Associações Nadadores–Salvadores (ANS)","Capitanias"],"correct":1},
+    {"chapter":0,"text":"Qual a entidade competente para a coordenação e controlo das ações de fiscalização da conformidade do exercício da atividade de Nadador-Salvador (NS) profissional?","options":["Autoridade Marítima Nacional (AMN)","Instituto de Socorros a Náufragos (ISN)","Agência Portuguesa do Ambiente (APA)","Câmaras Municipais (CM), Agência Portuguesa do Ambiente (APA) e Instituto de Socorros a Náufragos (ISN)"],"correct":1},
+    {"chapter":1,"text":"Indique qual a sequência correta nas categorias de progressão de carreira do Nadador-Salvador (NS) em Portugal?","options":["Nadador-Salvador, Nadador-Salvador Coordenador (NSC) e Nadador-Salvador Formador (NSF)","Nadador-Salvador, Nadador-Salvador Formador (NSF) e Nadador-Salvador Coordenador (NSC)","Nadador-Salvador, Nadador-Salvador Coordenador (NSC) e Nadador-Salvador Reformado (NSR)","Nadador-Salvador Formador (NSF), Nadador-Salvador e Nadador-Salvador Coordenador (NSC)"],"correct":0},
+    {"chapter":1,"text":"Qual das seguintes afirmações, constitui um mecanismo imprescindível de defesa e de prova da correta atuação do Nadador-Salvador (NS)?","options":["Efetuar um salvamento com o meio correto","O preenchimento cuidadoso dos relatórios de salvamento","Ter pelo menos duas testemunhas","O Nadador-Salvador não precisa de provas para a defesa da sua atuação"],"correct":1},
+    {"chapter":1,"text":"Após qualquer tipo de ocorrência é obrigatório e fundamental ____________para aumentar a qualidade do serviço prestado.","options":["Praticar exercício físico","Preencher o relatório","Acompanhar a vitima ao hospital","Chamar o 112"],"correct":1},
+    {"chapter":1,"text":"O Nadador-Salvador (NS) tem direitos e deveres que caracterizam o exercício da sua função. Qual destes é um direito?","options":["Possuir um seguro profissional adequado à atividade","Assegurar a vigilância do plano de água munido do meio de salvamento","Auxiliar e advertir os banhistas para situações de risco","Todas as respostas estão corretas"],"correct":0},
+    {"chapter":1,"text":"Que conselhos deve o Nadador-Salvador (NS) transmitir sobre a exposição solar?","options":["Aplicar protetor solar 30 minutos antes da exposição ao sol","Não exponha crianças com menos de três anos de idade ao sol","Faça períodos curtos de exposição solar","Todas as respostas estão corretas"],"correct":3},
+    {"chapter":1,"text":"A desidratação do Nadador-Salvador (NS) pode ser prevenida:","options":["Comendo refeições balanceadas antes do turno e durante os intervalos","Beber bebidas com cafeina e/ou açúcar","Ingerir bebidas alcoólicas","Ingerir pouca água durante o seu turno"],"correct":0},
+    {"chapter":1,"text":"Faz parte da conduta do Nadador-Salvador (NS):","options":["Atenção, postura, companheirismo e dignidade","Comunicação, prevenção, dignidade e dedicação","Companheirismo, atenção, assíduo, prevenção e comunicação","Prevenção, companheirismo, dignidade, comunicação e atenção"],"correct":3},
+    {"chapter":1,"text":"O Nadador-Salvador (NS) encontra-se devidamente uniformizado quando envergue pelo menos, os seguintes artigos do uniforme:","options":["Apito, pés de pato, cinto de salvamento e camisola de manga curta","Apito, boia torpedo, pés de pato e camisola de manga curta","Apito, pés de pato, camisola de manga curta e calção de banho (M/F)","Apito, calção de banho (M/F), pés de pato e corta-vento"],"correct":2},
+    {"chapter":1,"text":"A aquisição do uniforme do Nadador-Salvador (NS) é da responsabilidade do:","options":["Nadador-salvador","Concessionário","Associação de Nadadores salvadores (ANS)","Todas as respostas estão corretas"],"correct":0},
+    {"chapter":1,"text":"Quais as categorias de Nadador-Salvador (NS) que conhece?","options":["Nadador-salvador profissional (NSP) e Nadador Salvador voluntário (NSV)","Nadador salvador profissional (NSP) e Nadador Salvador examinador (NSE)","Nadador Salvador Coordenador (NSC) e Nadador Salvador Profissional (NSP)","Nadador Salvador Formador (NSF) e Nadador Salvador chefe de equipa (NSCH)"],"correct":2},
+    {"chapter":1,"text":"São deveres gerais do Nadador-Salvador (NS):","options":["Socorrer banhistas em situações de perigo, de emergência ou acidente","Possuir um seguro profissional adequado à atividade","Colaborar com o Instituto de Socorros a Náufragos (ISN) na elaboração de planos de emergência","Dispor de uniforme adequado"],"correct":0},
+    {"chapter":1,"text":"O Nadador-Salvador (NS) deve içar a bandeira de xadrez em que situações?","options":["Necessita de ir à casa de banho e assim consegue avisar os restantes NS da sua ausência","Realiza um salvamento, garantindo assim que o concessionário ligue para o 112","Existir trovoada e relâmpagos, para informar os banhistas que a praia tem de estar temporariamente desocupada","Em casos excecionais e de reconhecida emergência"],"correct":3},
+    {"chapter":1,"text":"Onde deve o Nadador-Salvador (NS) registar cuidadosamente todas as ocorrências?","options":["Na folha de registo do concessionário","Na agenda semanal","No bloco de notas","Nos relatórios"],"correct":3},
+    {"chapter":1,"text":"Após qualquer tipo de ocorrência na praia, o Nadador-Salvador (NS) é obrigado a preencher que tipo de documento?","options":["O relatório de salvamento","O relatório de ocorrências","Só é obrigado a preencher o relatório de salvamento se o acidente for grave","Não existe nenhum documento específico"],"correct":0},
+    {"chapter":1,"text":"O Nadador-Salvador (NS) tem deveres e direitos no exercício das suas funções. Qual das seguintes afirmações é um dever geral?","options":["Colaborar a título excecional com os banhistas","Não comparecer ao serviço com assiduidade","Participar em ações de treino, simulacros de salvamento marítimo ou em outro meio aquático","Exercer a atividade a título remunerado ou gratuito"],"correct":2},
+    {"chapter":1,"text":"O Nadador-Salvador (NS) tem deveres e direitos no exercício das suas funções. Qual das seguintes é um direito?","options":["Colaborar com os agentes de autoridade ou com outras entidades em matéria de segurança a banhistas","Não comparecer ao serviço com assiduidade","Participar em ações de treino, simulacros de salvamento marítimo ou aquático","Possuir um seguro profissional adequado à atividade"],"correct":3},
+    {"chapter":1,"text":"Vigiar a forma como decorrem os banhos em caso de acidente pessoal ocorrido com banhistas ou de alteração das condições meteorológicas, são:","options":["Deveres especiais do Nadador-Salvador (NS)","Direitos do Nadador-Salvador (NS)","Deveres gerais do Nadador-Salvador (NS)","Outros direitos do Nadador-Salvador (NS)"],"correct":2},
+    {"chapter":1,"text":"Socorrer os banhistas em situações de perigo, de emergência ou de acidente, são:","options":["Deveres especiais do Nadador-Salvador (NS)","Direitos do Nadador-Salvador (NS)","Deveres gerais do Nadador-Salvador (NS)","Outros direitos do Nadador-Salvador (NS)"],"correct":2},
+    {"chapter":1,"text":"Participar em ações de treino, simulacros de salvamento marítimo ou em outro meio aquático e outros exercícios com características similares, é:","options":["Um dever do Nadador-Salvador (NS)","Um dever extraordinário do Nadador-Salvador (NS)","Um dever especial do Nadador-Salvador (NS)","Facultativo"],"correct":0},
+    {"chapter":1,"text":"São fatores que contribuem para a ocorrência de acidentes de trabalho:","options":["Rotina, ausência de medidas de segurança e fadiga","Fadiga e rotatividade do posto de trabalho","Negligência dos banhistas, medidas de segurança e fadiga","Excesso de medidas de proteção"],"correct":0},
+    {"chapter":1,"text":"Após uma intervenção do Nadador-Salvador (NS) numa piscina, que documento terá de preencher?","options":["Relatório de praia, no prazo de 24 h","Relatório de ocorrências, no prazo de 48 h no portal da capitania on-line","Relatório de acidente em piscina, logo que possível","Relatório de ocorrência, no prazo de 24 h"],"correct":3},
+    {"chapter":1,"text":"Faz parte da conduta do Nadador-Salvador (NS):","options":["Prevenção","Companheirismo","Dignidade","Todas as respostas estão corretas"],"correct":3},
+    {"chapter":1,"text":"Dispor dos meios e equipamentos adequados afetos à segurança, vigilância, socorro, salvamento e assistência aos banhistas, são:","options":["Direitos do Nadador-Salvador (NS)","Deveres gerais do Nadador-Salvador (NS)","Deveres especiais do Nadador-Salvador (NS)","Todas as respostas estão corretas"],"correct":0},
+    {"chapter":1,"text":"No exercício das suas funções o Nadador-Salvador (NS) deve ter sempre presente que:","options":["Pode desempenhar tarefas estranhas á sua atividade","Deve efetuar uma tentativa de salvamento caso exista um grande risco de segurança de vida","Não é agente de Autoridade, nem seu substituto","Não deve efetuar um salvamento mesmo fora da sua área de responsabilidade"],"correct":2},
+    {"chapter":1,"text":"Assegurar a vigilância do plano de água, munido do meio de salvamento, é um:","options":["Dever geral","Dever especial","Uma recomendação","Todas as respostas estão corretas"],"correct":0},
+    {"chapter":1,"text":"Dispor de uniforme adequado que obedeça às especificações técnicas legalmente estabelecidas, são:","options":["Direitos do Nadador-Salvador (NS)","Deveres gerais do Nadador-Salvador (NS)","Deveres especiais do Nadador-Salvador (NS)","Todas as respostas estão corretas"],"correct":1},
+    {"chapter":1,"text":"O relatório de salvamento deve ser preenchido em que situações?","options":["Picada peixe-aranha","Criança perdida","Paragem digestiva","Todas as respostas estão corretas"],"correct":3},
+    {"chapter":1,"text":"Uma das funções mais importantes do Nadador-Salvador (NS) é a prevenção das situações de perigo informando e aconselhando os banhistas para potenciais incidentes e acidentes. Indique quais os principais conselhos a dar aos banhistas?","options":["Não vire as costas às ondas e ao mar, tome banho nas áreas indicadas como zonas de banho","Se se sentir cansado procure flutuar e procure sempre tomar banhos ou nadar acompanhado","Não hesite em pedir socorro quando em dificuldade, se sentir frio saia imediatamente da água","Todas as respostas estão corretas"],"correct":3},
+    {"chapter":1,"text":"A quem compete zelar pela segurança dos banhistas nos espaços aquáticos e zelar pela prevenção das condições ambientais desses espaços?","options":["Ao Nadador-Salvador (NS)","Autoridade Marítima Nacional (AMN) em conjunto com o Instituto de Socorros a Náufragos (ISN)","Ao concessionário ou à entidade responsável pela exploração do espaço aquático","À associação dos espaços aquáticos e ambientais"],"correct":0},
+    {"chapter":1,"text":"Qual da seguinte afirmações é uma dica para preservar o ambiente dos espaços aquáticos?","options":["O Nadador-Salvador (NS) não deve impor-se pelas suas atitudes, não dando bons exemplos e não contribuindo para o bem-estar de todos","Levar animais domésticos para a praia, porque são o melhor amigo do homem","Não andar na zona dunar para não danificar o ecossistema","Desobedecer às regras de higiene impostas nos espaços aquáticos construídos como piscinas e parques aquáticos"],"correct":2},
+    {"chapter":1,"text":"Os Nadadores-Salvadores (NS) têm como função assegurar a integridade física e a saúde dos banhistas dos espaços aquáticos, mas por vezes esquecem-se deles próprios. Alguns dos sintomas comuns de uma desidratação moderada incluem:","options":["Sede, sonolência e cansaço","Energia, pressão arterial alta e frequência cardíaca baixa","Sem pressão e sem frequência cardíaca","Aumento da produção de urina, boca húmida e pele vermelha"],"correct":0},
+    {"chapter":1,"text":"Ter especial atenção a crianças, idosos, pessoas portadoras de deficiência e outras não habituadas ao mar, (…) não deve ultrapassar os limites das suas qualificações e competências, devendo respeitar as hierarquias técnicas, estamos a falar de:","options":["Direitos do Nadador-Salvador (NS)","Deveres gerais do Nadador-Salvador (NS)","Deveres do Nadador-Salvador (NS)","Recomendações do Nadador-Salvador (NS)"],"correct":3},
+    {"chapter":1,"text":"O Nadador-salvador (NS) é a pessoa singular habilitada com o curso de NS certificado ou reconhecido pelo Instituto de Socorros a Náufragos (ISN), a quem compete, para além dos conteúdos técnicos profissionais específicos:","options":["Informar, prevenir, socorrer e prestar o Suporte Básico de Vida (SBV) com obrigatoriedade de vigilância","Informar, prevenir, socorrer em piscinas e outros locais onde ocorram práticas aquáticas com obrigatoriedade de vigilância","Informar, prevenir, socorrer e prestar o Suporte Básico de Vida (SBV) em qualquer circunstância nas praias de banhos, em áreas concessionadas, em piscinas e outros locais onde ocorram práticas aquáticas com obrigatoriedade de vigilância","Informar, prevenir, socorrer e prestar o Suporte Básico de Vida (SBV) em qualquer circunstância nas praias de banhos, nos pavilhões ginásio e em piscinas com obrigatoriedade de vigilância"],"correct":2},
+    {"chapter":2,"text":"Em que fase do afogamento, a vítima não faz qualquer tipo de movimento e continua a fazer grandes aspirações de água para o pulmão:","options":["Aspiração inicial de líquido","Apneia voluntária","Espasmo glótico","Apneia terminal"],"correct":2},
+    {"chapter":2,"text":"Na classificação de afogamento grau 3, como se apresenta o náufrago e quais os procedimentos a tomar:","options":["Pouca espuma na boca e/ou nariz, administrar oxigénio (O2) a 15litros/min, Posição Lateral de Segurança (PLS) e aquecimento corporal","Muita espuma na boca e/ou nariz com pulso periférico palpável, administrar oxigénio (O2) a 15litros/min no local do acidente, Posição Lateral de Segurança (PLS) e internamento hospitalar","Pouca espuma na boca e/ou nariz; administrar oxigénio (O2) nasal a 5litros/min, aquecimento corporal, repouso, tranquilização e observação hospitalar","Muita espuma na boca e/ou nariz sem pulso periférico palpável, administrar oxigénio (O2) a 15litros/min no local do acidente, Posição Lateral de Segurança (PLS) e internamento hospitalar"],"correct":1},
+    {"chapter":2,"text":"O que é o afogamento?","options":["É o processo que resulta em insuficiência respiratória por imersão ou submersão em meio líquido","É o processo que resulta em insuficiência cardíaca por imersão ou submersão em meio líquido","É o processo que resulta em insuficiência cerebral por imersão ou submersão em meio líquido","É o processo que resulta em insuficiência cardiocelular por imersão ou submersão em meio líquido"],"correct":0},
+    {"chapter":2,"text":"O organismo humano consegue sobreviver em situações adversas extremas e meios inóspitos, até cerca de:","options":["5 minutos sem oxigénio","5 minutos sem proteção e abrigo","3 minutos sem oxigénio e 3 horas sem proteção e abrigo","3 minutos sem oxigénio e 3 dias sem comida"],"correct":2},
+    {"chapter":2,"text":"A hipoxia, ocorre devido a","options":["Oxigénio a mais no cérebro","Falta de sangue no cérebro","Diminuição de oxigénio no sangue","Oxigénio a mais no sangue"],"correct":2},
+    {"chapter":2,"text":"Quais são as fases que caracterizam o afogamento?","options":["Apneia voluntária, aspiração inicial de líquido, apneia terminal e espasmo glótico","É a apneia involuntária, aspiração inicial, apneia e espasmo glótico","É a entrada de água nos pulmões, paragem do coração e falência cerebral","É a apneia voluntária, aspiração final de líquido e espasmo pulmonar"],"correct":0},
+    {"chapter":2,"text":"Em que fase do afogamento a vítima encontra-se em pânico total e luta com todas as forças para se manter à superfície, esta etapa pode durar entre 10 a 60 segundos:","options":["Apneia voluntária","Aspiração inicial de líquido","Espasmo glótico","Todas as respostas estão corretas"],"correct":0},
+    {"chapter":2,"text":"Em que fase do afogamento a vítima não faz qualquer tipo de movimento?","options":["Apneia voluntária","Aspiração inicial de líquido","Espasmo glótico","Todas as respostas estão corretas"],"correct":2},
+    {"chapter":2,"text":"Quais os sintomas de um náufrago afogado em grau 2?","options":["Pouca espuma na boca e/ou nariz","Pouca espuma na boca","Muita espuma na boca e/ou nariz","Muita espuma na boca"],"correct":0},
+    {"chapter":2,"text":"Na classificação do afogamento, qual o grau em que a vítima se encontra sem tosse, nem espuma na boca/nariz, nem dificuldades na respiração, nem paragem respiratória nem Paragem Cardiorrespiratória (PCR)?","options":["Grau 1","Grau 2","Resgate aquático","Grau 4"],"correct":2},
+    {"chapter":2,"text":"Quais os sintomas de um náufrago em afogamento de grau 4?","options":["Pouca espuma na boca e/ou nariz","Pouca espuma na boca","Muita espuma na boca e/ou nariz sem pulso periférico palpável","Muita espuma na boca e/ou nariz com pulso periférico palpável"],"correct":2},
+    {"chapter":2,"text":"A hipotermia ocorre quando a temperatura corporal baixa para além dos:","options":["35ºC","32ºC","38ºC","Limites"],"correct":0},
+    {"chapter":2,"text":"Qual é o tempo médio de sobrevivência de um náufrago, exposto a uma temperatura da água de 21ºC?","options":["24 horas","48 horas","2 a 3 dias","Nunca mais de 2 dias"],"correct":0},
+    {"chapter":2,"text":"Em que fase do afogamento acontece a inconsciência da vitima? \"Há água nos pulmões e estômago, podendo haver relaxamento dos esfíncteres\".","options":["Apneia voluntária","Espasmo glótico","Apneia terminal","Aspiração inicial do líquido"],"correct":2},
+    {"chapter":2,"text":"Na classificação do afogamento em que grau a vitima se encontra em paragem cardiorrespiratória (PCR)?","options":["Grau 5","Grau 1 e grau 2","Grau 4","Grau 6"],"correct":3},
+    {"chapter":2,"text":"Quais os perigos associados à temperatura da água:","options":["Hidrocussão e Hipertermia","Hipotermia e paragem digestiva","Hipotermia e Hidrocussão","Todas as respostas estão certas"],"correct":2},
+    {"chapter":2,"text":"As consequências do afogamento são classificadas como?","options":["Morte, rigidez e ausência de rigidez","Morte, óbito e ausência de morte","Morte, morbidez e ausência de morbidez","Apneia voluntaria, aspiração do líquido, apneia terminal e espasmo glótico"],"correct":2},
+    {"chapter":2,"text":"A vítima começa a perder as forças, existe aspiração de maior quantidade de líquido podendo ocorrer um laringospasmo. Qual a fase do afogamento que pode durar entre 60 a 90 segundos?","options":["Apneia terminal","Espasmo glótico","Aspiração inicial de líquido","Apneia voluntária"],"correct":2},
+    {"chapter":2,"text":"Um acidente provocado pela súbita exposição à água com a temperatura 5ºC abaixo da temperatura corporal, dá-se o nome de:","options":["Hipotermia ou hidrocussão","Hipotermia ou síndrome de imersão","Hidrocussão ou síndrome de imersão","Hipotermia moderada ou hidrocussão"],"correct":2},
+    {"chapter":3,"text":"Como é medida a amplitude (altura) da onda?","options":["Medida do distúrbio máximo durante um ciclo completo de oscilação","É medida em relação á linha de equilíbrio da onda","É medida em metros","Todas as respostas estão corretas"],"correct":3},
+    {"chapter":3,"text":"De quem é a responsabilidade de içar a bandeira, conforme a avaliação do estado do mar, condições ambientais e/ou por determinação da Autoridade Marítima Nacional (AMN)?","options":["Nadador-Salvador (NS)","Concessionário","Banhista","Todas as respostas estão corretas"],"correct":0},
+    {"chapter":3,"text":"É da responsabilidade do Nadador-Salvador (NS):","options":["Içar/arriar as bandeiras de sinais","Içar/arriar a bandeira azul","Içar/arriar a bandeira de ouro","Todas as respostas estão corretas"],"correct":0},
+    {"chapter":3,"text":"A bandeira xadrez tem as seguintes cores:","options":["Preto e branco","Vermelho e amarelo","Azul e branca","Vermelho e branco"],"correct":2},
+    {"chapter":3,"text":"Do seguinte material, qual não é obrigatório no posto de praia?","options":["Carretel e mastro de sinais","Mala de 1º socorros","Binóculos e telemóvel","Bandeiras de sinais"],"correct":2},
+    {"chapter":3,"text":"Qual a cor das bandeirolas de zona de banhos?","options":["Vermelha e Amarela","Amarela e verde","Vermelha","Amarela"],"correct":0},
+    {"chapter":3,"text":"Nas praias fluviais existem vários perigos, sendo característica de um deles \"…a água a cair de um obstáculo forma uma corrente de retorno sobre ele próprio…\". Estamos a falar de:","options":["Remoinhos","Funil ou escoadouro","Agueiros","Retornos"],"correct":3},
+    {"chapter":3,"text":"O que entende por mar total (set)?","options":["É um conjunto de sete ondas que vai aumentando de tamanho","Ondas geradas pelo vento com aspeto mais ou menos regular","Sobreposição de grupos de ondas geradas pelo vento na superfície do mar","Ondas que se propagam para fora da zona de geração com aspeto regular e cristas longas"],"correct":2},
+    {"chapter":3,"text":"Ao conceito de onda, associam-se três em que o Nadador-Salvador (NS) deve conhecer, para compreender as informações sobre a previsão do estado mar e atuar em conformidade. Estamos a falar de que conceitos?","options":["Comprimento da onda, período de onda e amplitude de onda","A vaga, ondulação e mar total (SET)","Onda mergulhante, onda progressiva e onda espraiada","Correntes de mar, correntes de maré e agueiros"],"correct":0},
+    {"chapter":3,"text":"A onda mergulhante caracteriza-se por:","options":["Onda que rebenta sempre com força e pode, facilmente, atirar um nadador para o fundo do mar e ocorre geralmente na maré baixa","Onda que rebenta com muita força enrola facilmente um nadador e ocorre na preia-mar","Onda que rebenta à frente da sua crista e ocorre na vazante","Onda que surge quando o mar fica encrespado e ocorre na enchente"],"correct":0},
+    {"chapter":3,"text":"Onda que apenas rebenta quando chega à linha de praia, devido a uma grande profundidade de água, de forma a que a onda não perde velocidade e, portanto, não ganha altura, denomina-se por:","options":["Onda mergulhante","Onda espraiada","Todos os tipos de ondas","Onda progressiva"],"correct":1},
+    {"chapter":3,"text":"O retorno ao mar da água das ondas e são normalmente mais fortes onde a praia tem o gradiente mais acentuado. Estamos a falar de:","options":["Correntes alternas","Correntes amovíveis","Correntes de maré","Correntes de mar"],"correct":3},
+    {"chapter":3,"text":"A água transportada para a praia acumula-se e procura retornar para o mar aberto, na zona de maior profundidade. Estamos a falar de que tipo de correntes?","options":["Agueiros ou \"Rip current\"","Correntes amovíveis","Correntes de maré","Correntes de mar"],"correct":0},
+    {"chapter":3,"text":"Os agueiros podem ser:","options":["Móveis quando aparecem subitamente, podendo ser muito fortes","Estacionários quando estão no mesmo local todo o ano, devido ao seu fundo arenoso","Móveis quando mudam de local diariamente, sendo extremamente perigosos","Estacionários quando o fundo é rochoso, mantêm-se permanentes ao longo do ano."],"correct":3},
+    {"chapter":3,"text":"Que tipos de agueiros conhece?","options":["Os estacionários, móveis e súbitos","Os estacionários, os móveis e \"rip current\"","Os móveis e os imóveis","Os perigosos e os não perigosos"],"correct":0},
+    {"chapter":3,"text":"Quais os sinais chaves que são indicadores de estar na presença de uma \"rip current\", agueiro ou golas?","options":["Ondas maiores e mais frequentes nos dois lados desta corrente","Tremura da Água no agueiro, quando à sua volta é lisa","Cor da água acastanhada devido ao arrastamento da areia do fundo","Todas as respostas estão corretas"],"correct":3},
+    {"chapter":3,"text":"Em Portugal, ocorrem duas marés altas e 2 marés baixas por dia, com intervalo de cerca de:","options":["12h25m entre a maré alta e a maré baixa e 6h12m entre duas marés altas consecutivas","Só existe uma maré baixa e uma maré alta","6h12m entre cada maré alta e maré baixa e 24h50 minutos entre 2 marés altas consecutivas","6h12m entre cada maré alta e baixa e 12h25m entre 2 marés altas consecutivas"],"correct":3},
+    {"chapter":3,"text":"O Nadador-Salvador (NS) perante um cenário de nevoeiro, que bandeira deve içar?","options":["Verde, se as condições de mar estivessem boas","Amarela, porque existe algum perigo","Vermelha, porque é uma situação de risco","Aquela que as condições de mar assim exigirem"],"correct":2},
+    {"chapter":3,"text":"De quem é a responsabilidade da aquisição dos materiais e equipamentos destinados à assistência a banhistas numa zona de apoio balnear (ZAB)?","options":["Da Autoridade Marítima Nacional (AMN)","Do Nadador-Salvador (NS)","Do Instituto de Socorros a Náufragos","Do Concessionário"],"correct":3},
+    {"chapter":3,"text":"O posto de praia e demais materiais complementares destinado à informação, vigilância e prestação de salvamento, socorro a náufragos e assistência a banhista, é instalado nas zonas de apoio balnear (ZAB) nos termos determinados por?","options":["O Instituto de Socorros a Náufragos (ISN)","O Edital da Capitania do Porto","Os concessionários","A Polícia Marítima (PM)"],"correct":1},
+    {"chapter":3,"text":"Existe um conjunto de materiais complementares ao posto de praia que não são obrigatórios. Quais são?","options":["Cercado de proteção, boia torpedo, cinto de salvamento e bandeiras de sinais","Prancha, carretel, vara e mala de 1os socorros","Boia circular, boia torpedo e armação de praia","Mota de água, viatura 4x4, embarcação de pequeno porte, moto 4x4 e apito"],"correct":3},
+    {"chapter":3,"text":"O cercado de proteção serve para cercar todo o material que faz parte do posto de praia, quantos metros tem?","options":["6 metros quadrados","5 metros quadrados","2,5 metros quadrados","Quatro metros quadrados"],"correct":1},
+    {"chapter":3,"text":"De que bandeira estamos a falar quando há \"condições aceitáveis para a pratica de banhos, assumindo as regras e recomendações de segurança\"?","options":["Bandeira amarela","Bandeira vermelha","Bandeira azul","Bandeira verde"],"correct":0},
+    {"chapter":3,"text":"Para delimitar a área de banhos, deverão ser colocadas próximo da linha de água e de forma visível duas bandeirolas. Quais as cores destas?","options":["Amarela e Laranja","Vermelha e Amarela","Xadrez de Preto e Branco","Verde e Amarela"],"correct":1},
+    {"chapter":3,"text":"Ao período de acalmia entre cada set, dá-se o nome de?","options":["Mar chão","Correntes de maré","Sota","Correntes de mar"],"correct":2},
+    {"chapter":3,"text":"Classifique as correntes nas praias fluviais:","options":["Retornos, Funil, Agueiros","Funil ou Escoadouro, Corrente de Mar","Agueiros, Retornos, Remoinhos","Remoinhos, Retornos, Funil ou Escoadouro"],"correct":3},
+    {"chapter":3,"text":"Nos casos em que a frente de praia tem uma extensão igual ou superior a 100 metros, é obrigatório manter quantos Nadadores-Salvadores (NS)?","options":["Obrigatório manter um Nadador-Salvador (NS) por cada 50 metros","Obrigatório manter dois Nadadores-Salvadores (NS) por cada 50 metros","Obrigatório manter um Nadador-Salvador (NS) por cada 25 metros","Nenhumas destas respostas estão corretas"],"correct":0},
+    {"chapter":3,"text":"A maré de sizígia ou maré viva ocorre quando:","options":["O Sol e a Lua estão alinhados com a Terra","O Sol e a Lua formam um ângulo de 90º com a Terra","A Terra completa uma volta ao Sol","A Terra completa uma volta no seu próprio eixo"],"correct":0},
+    {"chapter":3,"text":"A maré de quadratura ou maré morta ocorre quando","options":["O Sol e a Lua estão alinhados com a Terra","Após 12 horas de preia-mar","A Terra completa uma volta no seu próprio eixo","A Lua e o Sol estão posicionados num ângulo de 90º com a Terra"],"correct":3},
+    {"chapter":3,"text":"Quando a crista da onda rebenta à frente da mesma e surge principalmente na vazante. Identifique qual o tipo de onda descrita?","options":["Onda progressiva","Onda mergulhante","Onda de maré","Onda espraiada"],"correct":0},
+    {"chapter":3,"text":"Quais são os fatores que influenciam o declive numa praia marítima?","options":["O tamanho das partículas de sedimentos e a intensidade da ação das ondas","O tamanho e a intensidade da ação das ondas","O tamanho e a intensidade da ação das ondas, assim como, o tipo de areia","O tamanho e a intensidade da ação das ondas, assim como, o tipo de areia"],"correct":0},
+    {"chapter":4,"text":"Qual do seguinte material não pertence ao posto de piscina.","options":["Mala de 1º socorros","Plano rígido","Boia circular","Boia torpedo"],"correct":3},
+    {"chapter":4,"text":"Na piscina, a vigilância pode ser feita de que forma?","options":["Estática e em movimento","Dinâmica","Estática e dinâmica","Todas as respostas estão corretas"],"correct":2},
+    {"chapter":4,"text":"Quais os perigos associados às piscinas?","options":["Ambientais e humanos","Balneários","Crianças e idosos","Utentes de mobilidade reduzida"],"correct":0},
+    {"chapter":4,"text":"Do seguinte material qual é o obrigatório no posto de piscina?","options":["Plano rígido e mala de 1º socorros","Vara de salvamento e cinto de salvamento","Boia circular e armação de piscina","Todas as respostas estão corretas"],"correct":3},
+    {"chapter":4,"text":"Na sinalética utilizada em piscinas, enquadra-se os seguintes tipos de comunicação:","options":["Sonora, gestual e verbal","Verbal, visual e acústica","Visual, acústica e apito","Apito, rádio e bandeiras"],"correct":0},
+    {"chapter":4,"text":"Os sistemas de observação em piscinas, são técnicas de identificação proactiva de sinais de afogamento. Quais os sistemas adotados em Portugal?","options":["Observação parcial e observação total","Observação por zonas e observação completa","Observação total e de vigilância de emergência","Observação por zonas e de vigilância de emergência"],"correct":2},
+    {"chapter":4,"text":"Na vigilância em piscina, os indicadores de emergência podem ser:","options":["Um banhista que sai da água com as mãos na cabeça","Um banhista a flutuar em qualquer local da piscina","Uma ou mais pessoas a apontar numa determinada direção, com uma expressão facial preocupada","Todas as respostas estão corretas"],"correct":3},
+    {"chapter":4,"text":"Como se classifica os tanques em que as características morfológicas e funcionais que os tornam particularmente adequados ao recreio e diversão aquática através de acessórios lúdicos?","options":["Tanques Desportivos","Tanques Infantis ou Chapinheiros","Tanques de Recreio e Diversão","Tanque de Aprendizagem e Recreio"],"correct":2},
+    {"chapter":4,"text":"Diga qual o tempo máximo para auxiliar o utente em caso de incidente em piscina?","options":["20s","30s","35s","40s"],"correct":0},
+    {"chapter":4,"text":"Qual dos Requisitos Técnicos de Segurança está correto?","options":["Nos períodos de inatividade não deve ser garantido o isolamento do espelho de água prevenindo a ocorrência de acidentes","Os ralos de fundo, devem estar protegidos por grelhas de segurança apropriadas para que não seja possível alguém ficar preso","As escadas não precisam ser mantidas em perfeitas condições de utilização evitando assim o risco de lesões","As normas de funcionamento e os períodos de vigilância não devem estar afixados em local visível"],"correct":1},
+    {"chapter":4,"text":"Identifique a sinalética(s) destinada á assistência a banhistas nas Piscinas:","options":["Placas de Interdição","Perigos e Riscos","Recomendações","Todas as respostas estão corretas"],"correct":3},
+    {"chapter":4,"text":"Nas piscinas de uso público a contratação dos Nadadores-Salvadores (NS) é da responsabilidade da:","options":["Entidade que concessiona a piscina","Assembleia da Câmara Municipal","Associação de Natação local","Instituto de Socorros a Náufragos (ISN)"],"correct":0},
+    {"chapter":4,"text":"Quanto à natureza ambiental ou tipologia construtiva, as piscinas distinguem-se em:","options":["Piscinas ao ar livre, cobertas, combinadas, transformáveis","Piscinas cobertas, combinadas, transformáveis e convertíveis","Piscinas ao ar livre, cobertas, combinadas e convertíveis","Piscinas cobertas, combinadas, convertíveis e privadas"],"correct":2},
+    {"chapter":4,"text":"Quanto à valência ou tipologia funcional, as piscinas podem classificar-se nos seguintes grupos principais:","options":["Tanques desportivos, aprendizagem e recreio e juniores","Tanques desportivos, aprendizagem, infantis, recreio e juniores","Tanques desportivos, aprendizagem e recreio, infantis, recreio e diversão e polivalentes","Tanques desportivos, aprendizagem e recreio, infantis, juvenis, juniores e polifuncionais"],"correct":2},
+    {"chapter":4,"text":"Alguns dos banhistas nas piscinas, são considerados de risco por reunirem um conjunto de características que faz deles pessoas mais suscetíveis de sofrerem uma lesão. São grupo de risco:","options":["Os que não se encontram sob o efeito de álcool","Os que tem boa mobilidade","As crianças","Os que sabem nadar"],"correct":2},
+    {"chapter":4,"text":"O tipo da lesão e a capacidade de nadar do banhista vão determinar o seu comportamento e indicar se se trata de uma vítima colaborante ou não. As lesões mais comuns são?","options":["Hemorragias nasais, internas e externas e extensões","Fraturas, luxações hemorragias e extensões","Fraturas, luxações, cãibras e hemorragias","Cãibras, hemorragias, luxações e picadas"],"correct":2},
+    {"chapter":4,"text":"Material e equipamento destinados à informação, vigilância, prestação de socorro e salvamento, obrigatórios nos postos de piscinas, qual não pertence ao posto de piscina:","options":["Armação de piscina","Boia circular","Vara de salvamento","Bandeiras"],"correct":3},
+    {"chapter":4,"text":"Ter as instruções do Instituto de Socorros a Náufragos (ISN) e ter os meios de salvamento devidamente arrumados, estamos a falar de que material do posto de piscina?","options":["Armação piscina","Cadeira telescópica","Placar informativo","Edital de Piscina"],"correct":0},
+    {"chapter":4,"text":"Para efeito de cálculo do número de Nadadores-Salvadores (NS) empenhados nos dispositivos de segurança aquático em piscinas, deve atender-se:","options":["Um NS permanente, quando a lotação instantânea mínima de banhista é de até 400","Dois NS permanente, quando a lotação instantânea máxima de banhista é de até 400","Um NS permanente, quando a lotação instantânea máxima de banhista é de até 400","Dois NS permanente, quando a lotação instantânea mínima de banhista é de até 400"],"correct":2},
+    {"chapter":4,"text":"No decorrer da vigilância o Nadador-Salvador (NS) deve:","options":["Dedicar mais tempo aos banhistas que sabem nadar","Desvalorizar qualquer comportamento que indique problemas","Usar óculos de sol quando se encontra em piscinas cobertas","Avisar o colega responsável pela outra zona de vigilância caso os banhistas de risco mudem de zona"],"correct":3},
+    {"chapter":4,"text":"O Nadador-Salvador (NS) deve ser capaz de verificar a sua zona de vigilância e estar perto o suficiente para auxiliar em caso de incidente. Esta pratica é reconhecida internacionalmente e é denominada por:","options":["Sistema 10:20","Sistema 15:20","Sistema 20:20","Sistema 20:30"],"correct":0},
+    {"chapter":4,"text":"Nas piscinas, as normas de funcionamento e os períodos de vigilância devem ser afixados em local visível. Isto é considerado:","options":["Requisito técnico de segurança","Indicadores de emergência","Sistema de segurança","Sistema de observação"],"correct":0},
+    {"chapter":4,"text":"Em termos de sinalética entre Nadadores-Salvadores (NS), \"elevar o braço acima da cabeça agitando-o em movimentos circulares\". Corresponde a:","options":["OK","2ª Ajuda","Submerso","Parar"],"correct":1},
+    {"chapter":4,"text":"Segundo o Conselho Nacional da Qualidade (CNQ), as piscinas podem classificar-se com base nos seguintes critérios?","options":["Ambiente ou tipologia construtiva e valência ou tipologia funcional","Prática desportiva e prática de lazer","Tipologia ambiental e tipologia valenciana","Aprendizagem e competição"],"correct":0},
+    {"chapter":5,"text":"Quantos elos tem a cadeia de sobrevivência no afogamento?","options":["6","4","5","3"],"correct":2},
+    {"chapter":5,"text":"Na caracterização das fases do salvamento, no reconhecimento, qual a primeira ação que o Nadador-Salvador (NS) deve tomar?","options":["Escolher o método de salvamento adequado a situação","Alerta SOS - 1º ajuda","Avaliar as condições do mar e ambientais","Entrar na água com o meio de salvamento escolhido"],"correct":1},
+    {"chapter":5,"text":"Existem três fases do salvamento. Em que fase o Nadador-salvador (NS) tem que \"pensar antes de agir\"?","options":["Reconhecimento","Acão e planeamento","Ação","Planeamento"],"correct":3},
+    {"chapter":5,"text":"Existe sinalética especifica entre Nadadores-salvadores (NS). O NS que se encontra em terra verificar que o outro NS se virou para terra e tem os dois braços cruzados a cima da cabeça fora de água, o que lhe está a transmitir?","options":["O NS necessita de apoio","Pedido de 2º ajuda","Naufrago encontra-se mais para trás","Naufrago submerso"],"correct":3},
+    {"chapter":5,"text":"Na cadeia de sobrevivência do afogamento, qual dos elos se considera de maior importância?","options":["Prevenção","Reconhecer o afogado e ligar 112","Suporte Básico de Vida (SBV)","Todos são de igual modo importantes"],"correct":3},
+    {"chapter":5,"text":"Perante uma situação de múltiplos náufragos, o Nadador-Salvador (NS) deverá considerar a seguinte triagem:","options":["Primeiro os náufragos inconscientes","Primeiro os náufragos conscientes que sabem nadar","Primeiro os náufragos conscientes, entre estes, os não nadadores","Deverá efetuar o salvamento sem qualquer ordem porque o importante é salvar vidas"],"correct":2},
+    {"chapter":5,"text":"Em que fase do salvamento, o Nadador-Salvador (NS) deve escolher o meio de salvamento:","options":["No reconhecimento","Na ação","No planeamento","Na entrada na água"],"correct":2},
+    {"chapter":5,"text":"Tendo em conta a sinalética usada entre Nadadores-Salvadores (NS), quando este está na água virado para terra a efetuar movimentos com o braço lateralizado para cima e para baixo, batendo com a mão na água, significa que:","options":["Está-se a afogar","Necessita de apoio","O naufrago está submerso","Está a efetuar o 2º pedido de ajuda"],"correct":1},
+    {"chapter":5,"text":"Dos métodos de salvamento abaixo, indique o de menor e o de maior risco para o Nadador-Salvador (NS):","options":["Lançar e rebocar","Caminhar e nadar","Alcançar e rebocar","Nadar e rebocar"],"correct":2},
+    {"chapter":5,"text":"Em que fase do salvamento se encontra \"reconhecer as prioridades da emergência e quais os procedimentos necessários\"?","options":["Ação","Planeamento","Evacuação","Reconhecimento"],"correct":3},
+    {"chapter":5,"text":"Qual dos métodos de salvamento oferece menos perigo para o Nadador-Salvador (NS)?","options":["Remar","Rebocar","Lançar","Caminhar"],"correct":2},
+    {"chapter":5,"text":"Nos princípios do salvamento aquático, em que fase se encontra o \"constatar a emergência e assumir a responsabilidade\"?","options":["Planeamento","Evasão","Reconhecimento","Ação"],"correct":2},
+    {"chapter":5,"text":"Na fase da ação, existem várias formas de efetuar o salvamento e no que diz respeito ao grau de contacto com a vítima. Qual é o método em que utilizamos a vara de salvamento?","options":["Alcançar","Lançar","Caminhar","Nadar até a vítima"],"correct":0},
+    {"chapter":5,"text":"Qual destes métodos de salvamento oferece mais perigo para o Nadador-Salvador (NS)?","options":["Remar","Lançar","Nadar","Caminhar"],"correct":2},
+    {"chapter":5,"text":"Em que fase do salvamento, o Nadador-Salvador (NS) confirma o número(s) de vítima(s)?","options":["Na evasão","No reconhecimento","No planeamento","Na ação"],"correct":1},
+    {"chapter":5,"text":"Perante um náufrago consciente, o Nadador-Salvador (NS) deverá?","options":["Acionar a 2 ajuda","Ceder o meio de salvamento ao náufrago, criando uma barreira de interposição entre o NS e o náufrago","Dá-lhe 5 insuflações","Verificar se respira espontaneamente"],"correct":1},
+    {"chapter":5,"text":"As componentes do resgate aquático na fase de ação, são:","options":["Entrada, aproximação, reboque e transporte","Reconhecimento, planeamento e ação","Entrada, 2ª ajuda, aproximação e reboque","Seleção do meio, entrada, reboque e transporte"],"correct":0},
+    {"chapter":5,"text":"Ao chegar à distância de segurança e verificar que o náufrago está aparentemente inconsciente, qual deverá ser o seu procedimento?","options":["Pedir ajuda, retirar as vias respiratórias fora água e rebocá-lo","Acionar a 2ª ajuda","Pede-lhe colaboração no resgate","Agarrar o náufrago, trazendo-o à superfície se estiver submerso"],"correct":1},
+    {"chapter":5,"text":"Após alcançar o náufrago e verificar que está aparentemente inconsciente como deverá proceder?","options":["Iniciar o reboque para terra e dar-lhe 2 insuflações de 15 em 15 segundos","Resgata para terra sem insuflações","Retirar as vias respiratórias fora de água e dar-lhe 5 insuflações","Segura o náufrago em reboque convencional, retira as vias respiratórias fora de água, verificar a respiração espontânea, se não ventilar dá-lhe 10 insuflações"],"correct":3},
+    {"chapter":5,"text":"Perante uma vítima com suspeita de lesão na cervical, na ausência de alternativa e tendo de extrair a vítima da água. Que reboque utilizaria?","options":["Reboque convencional","Reboque pelos maxilares","Reboque com boia circular","Reboque braços em V"],"correct":3},
+    {"chapter":5,"text":"No algoritmo de salvamento aquático, indique, as operações a realizar na fase de reconhecimento?","options":["Alerta SOS, aproximar, resgatar, relatar","Localizar, transportar, avaliar, resgatar","Verificar n.º de náufragos, localizar, planear, abordar, transportar","Alerta SOS, verificar o n.º de náufragos, localizar, avaliar condições de mar"],"correct":3},
+    {"chapter":5,"text":"Após o Nadador-Salvador (NS) alcançar o náufrago, verificar que está aparentemente inconsciente e que não respira, como deverá proceder?","options":["Dá-lhe 3 insuflações, inicia o resgate para terra com 5 insuflações de 15 em 15 segundos","Resgate sem insuflações","Dá-lhe 5 insuflações, inicia o resgate para terra com 3 insuflações de 15 em 15 segundos","Dá-lhe 10 insuflações e inicia o resgate para terra"],"correct":3},
+    {"chapter":5,"text":"Quais as técnicas de extração de náufragos em piscina?","options":["Técnica de arrasto e a 2 nadadores salvadores","Técnica de declive suave e de declive acentuado","Técnica de bombeiro e por arrasto","Técnica de declive suave e a 2 nadadores salvadores"],"correct":1},
+    {"chapter":5,"text":"No sistema de sinalização com apito, é utilizado o seguinte código","options":["1 sopro curto para chamar à atenção de outros Nadadores-Salvadores (NS). 3 sopros longos para sinalizar o inicio de procedimento de salvamento e emergência","2 sopros curtos para chamar à atenção de utentes e banhistas. 1 sopro curto para chamar à atenção de outros Nadadores-Salvadores (NS)","1 sopro curto para chamar à atenção individualmente de utentes e banhistas. 3 sopros longos para sinalizar o inicio de procedimento de salvamento e emergência","2 sopros curtos para sinalizar o inicio de procedimento de salvamento e emergência. 3 sopros longos para chamar à atenção de outros Nadadores-Salvadores (NS)"],"correct":2},
+    {"chapter":5,"text":"Na cadeia de sobrevivência no afogamento, \"caso necessário ligar 112\", refere-se a que elo?","options":["Prevenção","Reconheça o afogado","Forneça flutuação","Retire da água"],"correct":1},
+    {"chapter":5,"text":"Quais os elos da cadeia de sobrevivência no afogado?","options":["112, Suporte Básico de Vida (SBV), Desfibrilhador Automático Externo (DAE) e Suporte Avançado de Vida (SAV)","Reconheça o afogado, Suporte Avançado de Vida (SAV), fornecer flutuação e prevenção","Prevenção, reconheça o afogado, forneça flutuação, retire da água e Suporte Básico de Vida (SBV)","112, reconheça o afogado, Suporte Básico de Vida (SBV) e Desfibrilhador Automático Externo (DAE)"],"correct":2},
+    {"chapter":5,"text":"Quais os cuidados a ter durante os reboques?","options":["Que a vitima tenha sempre as vias respiratórias fora de água","Que seja seguro para o Nadador-Salvador (NS) e para o náufrago","Que seja eficiente para o Nadador-Salvador (NS), de forma a que ao chegar a terra não esteja exausto para efetuar manobras de Suporte Básico de Vida (SBV)","Todas as respostas estão corretas"],"correct":3},
+    {"chapter":5,"text":"A máscara de reanimação (pocket mask) deve ser utilizada como mecanismo de barreira:","options":["Para diminuir a transmissão de bactérias","Para aumentar as probabilidades de sucesso","Para evitar a troca de oxigénio com o dióxido de carbono","Para a vítima reanimar mais rapidamente"],"correct":0},
+    {"chapter":5,"text":"Como deve proceder o Nadador-Salvador (NS) na abordagem ao náufrago consciente?","options":["Dar indicações curtas, claras e precisas","Ceder o meio de salvamento","Evitar situações de submersão","Todas as respostas estão corretas"],"correct":3},
+    {"chapter":6,"text":"O Nadador-Salvador (NS) encontra um banhista aparentemente inconsciente na praia, reúne as condições de segurança e avalia o estado de consciência. Como faz para a avaliação da função respiratória?","options":["AVDS","ABCDE","Permeabilização da via aérea e VOS","Avalia a função cardiocirculatória"],"correct":2},
+    {"chapter":6,"text":"Numa vitima inconsciente, criança e sabendo que é uma obstrução grave da via aérea, o que deve fazer?","options":["Iniciar RCP","Dar 30:2","Dar 5 insuflações seguidas de 15:2","Ligar 112"],"correct":3},
+    {"chapter":6,"text":"O Nadador-Salvador (NS) depara-se com um banhista em paragem respiratória e tem o kit de oxigenoterapia consigo. Que material deve utilizar?","options":["Mascara facial simples","Insuflador manual com balonete","Mascara facial composta","Todas as respostas estão corretas"],"correct":1},
+    {"chapter":6,"text":"Qual o débito que o Nadador-Salvador (NS) deve administrar utilizando os óculos nasais?","options":["Não utilizar débitos superiores a 5 litros/min de 02","Não utilizar débitos superiores a 10 litros/min de 02","Não utilizar débitos superiores a 15 litros/min de 02","Todas as respostas estão corretas"],"correct":0},
+    {"chapter":6,"text":"Perante uma obstrução da via aérea grave numa criança, ficando esta inconsciente, o Nadador-Salvador (NS) deve:","options":["Permeabilizar a via aérea, dar 5 insuflações seguidas de 1 min de SBV","Teste VOS, dar 5 insuflações e observar sinais de vida","Ligar 112 e iniciar RCP (15:2)","Iniciar RCP"],"correct":2},
+    {"chapter":6,"text":"Qual dos seguintes meios deve utilizar para administrar oxigénio por inalação?","options":["Máscara facial composta","Boca-a-boca","Insuflador manual com balonete","Todas as respostas estão corretas"],"correct":0},
+    {"chapter":6,"text":"No grau 3 do afogamento e após a recuperação num adulto, qual a quantidade de oxigénio a administrar?","options":["15 l/min","10 l/min","5 l/min","3 l/min"],"correct":0},
+    {"chapter":6,"text":"A permeabilização das vias aéreas, é uma técnica realizada em 2 passos, quais são?","options":["Extensão da cabeça e elevação da mandíbula","Hiperextensão da cabeça e elevação do queixo","Extensão da cabeça e elevação da mandíbula, exceto quando houver suspeita de trauma","A cabeça deve estar sempre na posição neutra"],"correct":2},
+    {"chapter":6,"text":"Quais os objetivos da posição lateral de segurança?","options":["Realiza-se sempre que a vítima não responde e não respira","Manter as vias aéreas permeáveis e evitar a aspiração do vómito","Evitar a aspiração do vómito e manter a cabeça em flexão","Evitar a pressão sobre o coração e o pulmão direito"],"correct":1},
+    {"chapter":6,"text":"Quais os cuidados a ter na aplicação das insuflações?","options":["Manter a cabeça da vítima em posição neutra, para o ar ir diretamente para os pulmões","Inspirar normalmente, colocar a boca no bocal da máscara, insuflar o ar de forma homogénea e ao mesmo tempo verificar se o tórax se eleva","Inspiração forte, selar bem a boca do Nadador-Salvador (NS) com a da vítima e realizar a insuflação rapidamente, verificando se o tórax se eleva","As 2 insuflações aplicadas pelo Nadador-Salvador (NS) não devem durar mais de 2 segundos"],"correct":1},
+    {"chapter":6,"text":"Sempre que o Suporte Básico de Vida (SBV), é aplicado na sequência do resgate aquático, que passos podem ser suprimidos com o objetivo de ganhar tempo?","options":["Avaliar as condições de segurança e avaliar o estado de consciência","Avaliar o estado de consciência, gritar por ajuda e ligar 112","Avaliar condições de segurança e ligar 112;","Teste de VOS e ligar 112"],"correct":1},
+    {"chapter":6,"text":"No Suporte Básico de Vida (SBV) há uma fase denominada por \"avaliação do estado de consciência\", o que deverá fazer o Nadador-Salvador (NS) para avaliar esse estado?","options":["Abanar a vitima nos ombros e pergunta em voz alta: \"Está bem? Está-me a ouvir?\"","Havendo condições de segurança agarra um objeto pontiagudo e pica levemente a vítima para ver se há resposta","Presta-lhe 1 minuto de SBV, se a vítima se encontrar inconsciente","Se estão asseguradas as condições de segurança, aciona a 2ª ajuda"],"correct":0},
+    {"chapter":6,"text":"Numa situação em que o náufrago se encontre em paragem cardiorrespiratória, quando é que o Nadador-Salvador (NS) deixa de prestar o Suporte Básico de Vida (SBV)?","options":["Até a vítima mexer os olhos, ou ficar uma marca vermelha na zona onde o NS faz as compressões","Quando a vítima respirar normalmente, chegar a ajuda diferenciada que tome conta da situação ou exaustão do NS","Até chegarem os familiares da vítima","Ao fim de 3 ciclos de compressões e insuflações"],"correct":1},
+    {"chapter":6,"text":"No algoritmo do suporte básico de vida (SBV), se a vitima não ventila e após ligar 112, qual é o próximo passo?","options":["Faz a permeabilização da via aérea","Verifica a respiração (VOS)","Coloca em posição lateral de segurança (PLS)","Ressuscitação Cárdio Pulmonar (RCP)"],"correct":3},
+    {"chapter":6,"text":"Sendo caso pediátrico e estando sozinho, quando é que o Nadador-Salvador (NS) aciona 2ª ajuda?","options":["Após verificar que não ventila","Após a permeabilização da via aérea","Após 5 insuflações","Após um minuto de Suporte Básico de Vida (SBV)"],"correct":3},
+    {"chapter":6,"text":"Ao efetuar o patrulhamento na sua área de responsabilidade o Nadador-Salvador (NS) depara-se com um banhista adulto inconsciente no areal. Após verificar que não ventila, o que deverá fazer?","options":["Inicia Suporte Básico de Vida (SBV) 30:2","Dá 2 insuflações, inicia Suporte Básico de Vida (SBV) 30:2","Dá 5 insuflações, 1 minuto de Suporte Básico de Vida (SBV) e ativa o 112","Aciona a 2ª ajuda"],"correct":3},
+    {"chapter":6,"text":"Não sendo caso de afogamento, quando é que o Nadador-Salvador (NS) aciona a 2ª ajuda?","options":["Após um minuto de Suporte Básico de Vida (SBV)","Após a permeabilização da via aérea","Após verificar que a vitima não ventila","Após testar a consciência"],"correct":2},
+    {"chapter":6,"text":"O Nadador-Salvador (NS) encontra um banhista no areal, inanimado e que não respira. Após acionar a 2ª ajuda qual é o passo seguinte em termos de Suporte Básico de Vida (SBV)?","options":["Presta um minuto de SBV","Aplica 30 compressões","Gritar por ajuda","Aplica 5 insuflações"],"correct":1},
+    {"chapter":6,"text":"\"A incapacidade de chorar, ruído agudo alto à inspiração ou ausência total de ruído, cianose…\", são sinais e sintomas de obstrução da via aérea. Perante esta descrição, como a classifica quanto à sua gravidade?","options":["Ligeira","Total","Grave","Parcial"],"correct":2},
+    {"chapter":6,"text":"Está perante uma obstrução da via aérea grave. Em que situação deve optar pelas compressões torácicas em vez das compressões abdominais?","options":["Vítima de afogamento","Vítima de paragem digestiva","Vítima com obesidade mórbida","Vítima de cansaço"],"correct":2},
+    {"chapter":6,"text":"O Nadador-Salvador (NS) presencia uma situação em que há obstrução da via aérea grave num adulto, ficando inconsciente deverá fazer?","options":["Dar 5 insuflações com a máxima força para empurrar o objeto que não deixa passar o ar","Dar até 5 pancadas interescapulares ou iniciar a manobra de Heimlich","Aciona 112","Iniciar o Suporte Básico de Vida (SBV)"],"correct":2},
+    {"chapter":6,"text":"Quais os métodos de ventilação artificial que conhece?","options":["Ar expirado e mecânicos","Insuflação e inalação","Boca-a-boca e boca-estoma","Inalação e compressão"],"correct":0},
+    {"chapter":6,"text":"Perante uma obstrução da via aérea grave num latente, deve:","options":["Fazer 5 compressões abdominais","Fazer 5 compressões torácicas","Levar 5 vezes os joelhos do bebe ao abdómen","Deitar o bebé em decúbito dorsal no chão e fazer uma massagem abdominal"],"correct":1},
+    {"chapter":6,"text":"Qual a consequência ao aplicar ventilações muito rápidas e com muita força?","options":["Rebentamento dos alvéolos pulmonares","Fratura do esterno","Distensão gástrica","Excesso de oxigénio no sangue"],"correct":2},
+    {"chapter":6,"text":"Perante que sinais e sintomas deverá o Nadador-Salvador (NS) administrar oxigénio?","options":["Nos casos de dispneia","Sempre que a vítima pedir","Intoxicação por GRAMOXONE","Em situações extremas"],"correct":0},
+    {"chapter":6,"text":"Ao administrar oxigénio a uma vítima, o Nadador-Salvador (NS) deve considerar:","options":["A utilização de óculos nasais, sempre que a vítima esteja inconsciente","A utilização de máscara simples, para débitos de 10 l/min","A utilização de máscara composta para débitos de 10 l/min e 15 l/min","A utilização de máscara composta para débitos de 5 l/min"],"correct":2},
+    {"chapter":6,"text":"Quando utilizar o insuflador manual ligado a uma fonte de oxigénio (O2), o Nadador-Salvador (NS) deve considerar:","options":["Nunca utilizar o tubo orofaríngeo (Guedel)","Utilizar o tubo orofaríngeo apenas nos adultos","Nunca utilizar o tubo orofaríngeo nos bebés","Utilizar sempre o tubo orofaríngeo"],"correct":3},
+    {"chapter":6,"text":"Em que situações o Nadador-Salvador (NS) deverá administrar 10 litros de oxigénio a uma criança?","options":["Hemorragias ligeiras","Edema agudo do pulmão","Dificuldade respiratória ligeira","Crise de asma ligeira"],"correct":1},
+    {"chapter":6,"text":"Em que situações o Nadador-Salvador (NS) deverá administrar 5 litros de oxigénio a um adulto?","options":["Hemorragias graves","Crise de asma ligeira","Paragens respiratória","Edema agudo do pulmão"],"correct":1},
+    {"chapter":6,"text":"Quais os cuidados a ter com o equipamento de oxigénio (O2)?","options":["Não expor a garrafa a temperaturas superiores a 30ºC","Manter o equipamento sempre limpo e lubrificado","Após a sua utilização fechar a garrafa e descarregar o sistema","Não fumar ou fazer lume ao administrar oxigénio, realizar a prova hidráulica de 10 em 10 anos"],"correct":2},
+    {"chapter":6,"text":"Quais os riscos para o Nadador-Salvador (NS) associados à prestação de 1ºs socorros?","options":["Ficar exausto e não conseguir executar as manobras de Suporte Básico de Vida (SBV)","Não usar luvas, máscara e não desinfetar as vias aéreas da vítima com álcool a 70º","Expor-se a um risco igual ou superior ao que a vítima está exposta","O NS deve correr riscos para salvar a vida da vítima, pois é esse o seu dever."],"correct":2},
+    {"chapter":6,"text":"A respiração artificial com ar expirado pode ser feita de que modos:","options":["Com o insuflador manual","Boca-a-boca, boca-nariz-boca e Boca-estoma","Boca-nariz, boca-máscara e máscara composta","Todas as respostas anteriores estão corretas"],"correct":1},
+    {"chapter":6,"text":"A respiração artificial com a ventilação mecânica é feita com o seguinte aparelho:","options":["Insuflador manual","Máscara facial composta","Máscara facial simples","Todas as respostas anteriores estão corretas"],"correct":0},
+    {"chapter":6,"text":"Caracterize os procedimentos do exame Primário?","options":["Permeabilidade da via aérea, Exposição com prevenção de Hipotermia, função ventilatória, função respiratória e função circulatória","Permeabilidade da via aérea, função respiratória, função cardiocirculatória, disfunção neurológica, exposição com prevenção da Hipotermia","Função ventilatória, função respiratória, função circulatória e permeabilidade da via aérea","Função ventilatória, função circulatória, função neurológica, prevenção da hipotermia, estímulos verbais e de reação"],"correct":1},
+    {"chapter":6,"text":"A Posição lateral de segurança (PLS) é efetuada, quando?","options":["Quando a vitima não respira","A vitima está inconsciente, mas ventila e há suspeita de trauma","Quando a vitima está inconsciente, mas ventila e não há suspeitas de trauma, certificar-se que tem a via aérea permeabilizada","Quando a vitima está inconsciente, mas ventila normalmente e não há suspeitas de trauma e a via aérea não está permeabilizada"],"correct":2},
+    {"chapter":6,"text":"Identifique como proceder para auferir a autonomia da garrafa de oxigénio (O2):","options":["Saber a sua pressão e dividir pela sua capacidade","Saber a capacidade da garrafa e a sua pressão","Saber os minutos e pela sua capacidade","Multiplicar pela sua capacidade e dividir pela sua pressão"],"correct":1},
+    {"chapter":6,"text":"Indique qual o método e os débitos indicados, quando se utiliza a máscara composta para administrar oxigénio (O2)?","options":["Insuflação com 10l/15l minuto","Inalação com 10l/15l minuto","Insuflação com 5l minuto","Inalação com 5l minuto"],"correct":1},
+    {"chapter":6,"text":"O Nadador-Salvador (NS) tem 100 bar na garrafa de Oxigénio (O2) de 2 litros, está a debitar 10 litros, durante quanto tempo consegue o NS fornecer O2?","options":["10 minutos","15 minutos","20 minutos","25 minutos"],"correct":2},
+    {"chapter":6,"text":"Perante uma criança com uma crise de asma grave, o Nadador-Salvador (NS) administra oxigénio (O2) e liga 112. A garrafa de 2 litros está carregada a 180 bar, durante quanto tempo o NS consegue garantir a administração de oxigénio (O2) a vítima?","options":["25 minutos","36 minutos","24 minutos","72 minutos"],"correct":1},
+    {"chapter":6,"text":"Perante um adulto com uma crise de asma grave, o Nadador-Salvador (NS) administra oxigénio (O2) e telefona ao 112. A garrafa de 2 litros está carregada a 150 bar, durante quanto tempo o NS consegue garantir a administração de oxigénio (O2) a vítima?","options":["30 minutos","25 minutos","60 minutos","20 minutos"],"correct":3},
+    {"chapter":6,"text":"Para fazer face a uma paragem cardiorrespiratória, o Nadador-Salvador (NS), utiliza o Suporte Básico de Vida (SBV) com o objetivo de garantir:","options":["A avaliação inicial, Ver, Ouvir e Sentir (VOS) e a permeabilização da via aérea","A ventilação e circulação","A permeabilização da via aérea e a ventilação","As Compressões Torácicas Externas (CTE) e as insuflações"],"correct":1},
+    {"chapter":6,"text":"Se a vítima respira e está inconsciente, deve-se:","options":["Iniciar as manobras de Suporte Básico de Vida (SBV)","Colocar açúcar debaixo da língua","Elevar as pernas a 45º","Colocar na Posição Lateral de Segurança (PLS)"],"correct":3},
+    {"chapter":6,"text":"A compressão cardíaca externa faz-se no:","options":["No terço superior externo","No terço inferior externo","Na linha do umbigo","No centro do tórax"],"correct":3},
+    {"chapter":6,"text":"Porque é importante permeabilizar a via aérea da vítima antes de iniciar o (VOS) Ver Ouvir e Sentir?","options":["Porque a queda da língua pode bloquear a via aérea","Porque a queda da língua pode causar uma hemorragia","Porque a vítima pode ter algum alimento na boca que necessita de engolir","Porque a queda da língua é a causa de todas as paragens cardiorrespiratórias"],"correct":0},
+    {"chapter":6,"text":"Como se executam compressões torácicas eficazes?","options":["Deprimindo o externo 5 a 6 cm a uma frequência de pelo menos 100 por minuto e não mais que 120 por minuto","Deprimindo o externo 5 a 6 cm a uma frequência de pelo menos 80 por minuto e não mais que 100 por minuto","Deprimindo o externo 5 a 6 cm a uma frequência de pelo menos 60 por minuto e não mais que 80 por minuto","Deprimindo o externo 5 a 6 cm a uma frequência de pelo menos 60 por minuto e não mais que 70 por minuto"],"correct":0},
+    {"chapter":6,"text":"Como proceder perante uma situação de obstrução da via aérea (OVA) em que a vítima tosse e fala com dificuldade?","options":["Realizar de imediato 5 compressões torácicas","Realizar de imediato 5 pancadas interescapulares","Realizar de imediato 5 compressões abdominais","Incentivar a vítima a tossir"],"correct":3},
+    {"chapter":6,"text":"Quantos centímetros deve o tórax baixar durante as compressões torácicas no adulto?","options":["3 a 5 centímetros","4 a 5 centímetros","4 a 6 centímetros","5 a 6 centímetros"],"correct":3},
+    {"chapter":6,"text":"Ao chegar ao ginásio encontra uma pessoa caída junto a uma das máquinas. Qual o primeiro passo perante a situação?","options":["Avaliar as condições de segurança","Ligar 112","Avaliar o estado de consciência","Teste VOS"],"correct":0},
+    {"chapter":6,"text":"Qual a sequência correta do Suporte Básico de Vida (SBV)?","options":["Permeabilizar a via aérea, teste de VOS e avaliar do estado de consciência","Avaliar condições de segurança, permeabilizar a via aérea, teste de VOS","Ligar 112, permeabilizar a via aérea e 5 insuflações","Avaliar condições de segurança, avaliar o estado de consciência e permeabilizar a via aérea"],"correct":3},
+    {"chapter":6,"text":"Perante uma obstrução da via aérea grave, qual o procedimento correto?","options":["Encorajar a tossir se consciente e abanar a vítima","Se a vítima ficar inconsciente, ligar 112, permeabilizar a via aérea e Respiração Cárdio Pulmonar (RCP)","Se o ar não entrar nas insuflações, repetir a manobra as vezes necessárias até que o ar entrar","Aplicar de imediato 1 minuto de Suporte Básico de Vida (SBV) e depois avaliar, se necessário ligar 112"],"correct":1},
+    {"chapter":7,"text":"Do ponto de vista fisiopatológico, podemos identificar quantos tipos de choque?","options":["2","4","3","5"],"correct":2},
+    {"chapter":7,"text":"Existem vários tipos de queimaduras, em que grau há destruição de toda a espessura da pele e dos tecidos adjacentes, podendo chegar á carbonização. A pele apresenta-se acastanhada ou negra.","options":["Queimadura 2º grau","Queimadura 4º grau","Queimadura 3º grau","Queimadura 1º grau"],"correct":2},
+    {"chapter":7,"text":"Existem vários tipos de queimaduras, em que grau a pele apresenta-se vermelha (eritema), quente, seca, dolorosa e sente-se ardor?","options":["Queimadura 4º grau","Queimadura 3º grau","Queimadura 2º grau","Queimadura 1º grau"],"correct":3},
+    {"chapter":7,"text":"Existem vários tipos de queimaduras, em que grau a pele apresenta-se vermelha, quente, seca com ardor e dor, aparecendo flictenas (pequenas bolhas)?","options":["Queimadura 4º grau","Queimadura 3º grau","Queimadura 2º grau","Queimadura 1º grau"],"correct":2},
+    {"chapter":7,"text":"Entrada repentina de um banhista na água fria, pode causar a paragem brusca das funções vitais. De que tipo de acidente mais frequente estamos a falar:","options":["Insolação","Hidrocussão","Hidrocussão","Golpe de calor"],"correct":1},
+    {"chapter":7,"text":"Do ponto de vista fisiopatológico, quais os tipos de choque que conhece?","options":["Hipovolémico, Neurogénico e Cardiogénico","Neurogénico, Anafilático e Hemorrágico","Cardiogénico, Hemorrágico e Hipovolémico","Neurogénico, Hipovolémico e Convulsivo"],"correct":0},
+    {"chapter":7,"text":"A hemorragia é a saída do sangue das artérias, veias ou capilares. Como se apresenta o sangue de uma hemorragia arterial?","options":["Sangue apresenta-se \"suar\" através das feridas","Sangue apresenta-se vermelho escuro, sai babando","Sangue apresenta-se na ferida e provoca hematoma","Sangue apresenta-se vermelho vivo, e tem a sua saída em jatos intermitentes"],"correct":3},
+    {"chapter":7,"text":"Qual a sintomatologia associada às hemorragias?","options":["Ausência de dor, sem sinais e sintomas de choque e bradicardia","A vítima refere sede, dor no local e tem a visão turva","Sinais e sintomas de choque neurogénico, perda de volume de sangue","Todas as respostas estão corretas"],"correct":1},
+    {"chapter":7,"text":"Qual o procedimento do Nadador-Salvador (NS), perante um acidente causado por contacto com caravelas portuguesas?","options":["Esfregar bem a área atingida, para remover completamente os tentáculos ou partes da matéria colada ainda na pele","Colocar compressas no local com água do mar gelada e vinagre no local afetado, por períodos de 10 a 20 minutos","Colocar compressa no local com álcool, para aliviar o ardor e promover a libertação do veneno na corrente sanguínea","Lavar bem com água doce corrente, até que o ardor passe no local afetado, durante 10 a 20 minutos"],"correct":1},
+    {"chapter":7,"text":"Qual a sintomatologia associada à paragem digestiva?","options":["Cianose, sem perda de conhecimento e suores frios","Aumento da pressão arterial, enjoos e perda de conhecimento","Suores frios, cãibras e palidez da pele","Vómitos, náuseas, pele seca e cianose"],"correct":2},
+    {"chapter":7,"text":"Qual a abordagem do Nadador-Salvador (NS), a uma vítima com suspeita de traumatismo vertebromedular?","options":["Movimentar a vítima para um local seguro o mais rapidamente possível","Exame geral da vítima, avaliação neurológica (AVDS) e prevenir o choque","Evacuar a vítima para o hospital, o mais rapidamente possível e por qualquer meio","Verificar o estado geral da vítima, segundo a escala de avaliação neurológica de Heimlich, vigiar as funções vitais"],"correct":1},
+    {"chapter":7,"text":"Qual a sintomatologia associada à hiperglicemia?","options":["Náuseas, vómitos, diminuição da frequência ventilatória e hiperatividade","Fraqueza muscular, aumento da frequência ventilatória e hálito cetónico","Sonolência, fraqueza muscular e diminuição da frequência ventilatória","Sensação de fome, pulso rápido e sudação abundante"],"correct":1},
+    {"chapter":7,"text":"Quais os procedimentos a adotar numa vítima em hiperglicemia?","options":["Vigiar os sinais vitais, determinar a glicemia capilar e promover o transporte da vítima ao hospital","Dar água açucarada em caso da glicemia superior a 60 mg/dl depois de determinar a glicemia capilar","Dar de beber, mesmo que exista vómito","Dar uma papa espessa de açúcar"],"correct":0},
+    {"chapter":7,"text":"Qual a sintomatologia associada à insolação?","options":["Pele húmida e rosada, ventilação rápida e profunda","Aumento da temperatura corporal e pele com aspeto congestionado e avermelhada","Pele avermelhada, ventilação lenta e superficial e agitação","Pele seca, vómitos, pulso lento e regular e convulsões"],"correct":1},
+    {"chapter":7,"text":"De que acidente estamos a falar, que afeta normalmente as pessoas que estão expostas a ambientes quentes e húmidos durante um período prolongado?","options":["Da insolação","Da Hipertermia","Do golpe de calor","Da hidrocussão"],"correct":2},
+    {"chapter":7,"text":"Um dos acidentes mais frequentes nas praias é a hipotermia. Quais os procedimentos que devemos adotar?","options":["Retirar vestuário molhado ou húmido","Abordar a vítima segundo a metodologia ABCDE","Arrefecer o ambiente, quando possível","Fazer movimentos bruscos que podem originar arritmias e paragem cardíaca"],"correct":0},
+    {"chapter":7,"text":"Quais os fatores e circunstâncias que podem desencadear as crises de epilepsia?","options":["Nível baixo de açúcar no sangue e falta de sono","Fraqueza muscular e hidratação","Tonturas, pulso rápido e fraco","Náuseas e/ou vómitos e níveis altos de açúcar"],"correct":0},
+    {"chapter":7,"text":"Quais os procedimentos perante uma vítima com sinais evidentes de desidratação?","options":["Dar líquidos à vítima abundantemente e cobri-la com panos molhados","Colocar a vítima num chuveiro com água tépida e aplicar um creme gordo","Prevenir o estado de choque e dar de beber à vítima pequenas quantidades de líquidos","Colocar a vítima em Posição lateral de Segurança (PLS), arejar o local e agitar o ar à sua volta"],"correct":2},
+    {"chapter":7,"text":"Qual o procedimento perante uma vítima com sinais de crise epilética (Grande Mal Epilético)?","options":["Maniatar a vítima, falar alto com ela, dizendo-lhe para se acalmar","Manter a via aérea permeável, não colocar nada na boca da vítima durante as crises","Agarrar a vítima com força para evitar que ela se magoe, colocar um lenço entre os dentes desta, para que não morda a língua","Se a crise ocorrer na água, iniciar imediatamente as manobras de Suporte Básico de Vida (SBV) aplicando 5 insuflações"],"correct":1},
+    {"chapter":7,"text":"Perante a ocorrência de uma criança perdida, devemos","options":["Procurar a criança acompanhado pelos pais desta, para facilitar o seu reconhecimento","Procurar a criança na direção do sol, porque elas caminham nessa direção","Emitir um alerta via rádio/telemóvel para os outros postos de praia e agentes da Autoridade Marítima Nacional (AMN), informando-os do sucedido","Abandonar a sua área de responsabilidade, pois esta situação é mais urgente do que vigiar a sua área de responsabilidade"],"correct":2},
+    {"chapter":7,"text":"\"Diminuição do volume de sangue dentro dos vasos\". Que tipo de choque pode ocorrer?","options":["Choque Neurogénico","Choque Hipovolémico","Choque Cardiogénico","Todas as respostas anteriores estão corretas"],"correct":1},
+    {"chapter":7,"text":"Identifique as técnicas de remoção de vitimas de Traumatismo Vertebromedular (TVM).","options":["Levantamento e Rolamento","Arrancamento, Rolamento; Deslocamento","Levantamento; Levantamento","Arrancamento."],"correct":0},
+    {"chapter":7,"text":"Identifique as fases que se podem suceder continuamente no Grande Mal Epilético:","options":["Tónica e Pós-Critica","Aura e Clónica","Clónica e Aura","Tónica e Clónica"],"correct":3},
+    {"chapter":7,"text":"No exame geral da vítima, num Traumatismo Vertebromedular (TVM), a avaliação neurológica permite-nos determinar entre outros:","options":["O debito de O2 que necessita","A função respiratória e circulatória","Se responde a estímulos verbais e/ou dolorosos","O estado de hipotermia da vítima"],"correct":2},
+    {"chapter":7,"text":"No Grande Mal Epilético, qual é a fase em que a vítima perde a consciência:","options":["Fase aura","Fase tónica","Fase clónica","Pós-crítica"],"correct":1},
+    {"chapter":7,"text":"No Grande Mal Epilético, qual é a fase em que a vítima tem movimentos de contração-relaxamento de grupos de músculos:","options":["Fase aura","Fase tónica","Fase clónica","Pós-crítica"],"correct":2},
+    {"chapter":7,"text":"No Grande Mal Epilético, qual é a fase em que a vítima tem ou refere ter tido uma alucinação sensorial com sensação de ataque eminente:","options":["Fase aura","Fase tónica","Fase clónica","Pós-crítica"],"correct":0},
+    {"chapter":7,"text":"Os mergulhos, saltos para a água, quedas, são ações em que podem resultar em traumatismos vertebromedulares (TVM). Perante uma suspeita de (TVM), o Nadador-Salvador (NS) deve:","options":["Manter a vítima na água para prevenir o choque neurogénico;","Manter a vítima em imobilização absoluta e colocar o colar cervical","Não utilizar o plano rígido, vigiar sinais vitais e evacuar para o hospital","Todas as respostas anteriores estão corretas"],"correct":1},
+    {"chapter":7,"text":"De que acidente estamos a falar quando existe a incapacidade de regulação térmica do organismo, por exposição a climas quentes, provocada pela falência do mecanismo de regulação térmica?","options":["Insolação","Golpe de calor","Hipotermia","Hidrocussão"],"correct":0},
+    {"chapter":7,"text":"Na Epilepsia consiste numa desordem crónica do sistema nervoso. Em que fase a vítima tem alterações sensoriais, nomeadamente auditiva, visual, gustativa e olfativa com sensação de ataque iminente?","options":["Fase tónica","Fase clónica","Fase aura","Fase de relaxamento"],"correct":2},
+    {"chapter":7,"text":"Como classificar a avaliação da gravidade de uma queimadura?","options":["Profundidade, intensão, localização e idade","Profundidade, extensão, localização e idade","Profundidade, extensão, localização e sexo","Profundidade, intensão, localização e sexo"],"correct":1},
+    {"chapter":7,"text":"Numa vítima de golpe de calor qual o seu procedimento?","options":["Transportar de acordo com o grau de afogamento da vítima","Levar a vítima para um lugar quente e fechado","Dar-lhe água a beber em grandes quantidades","Transportar de acordo com o grau de consciência da vítima"],"correct":3},
+    {"chapter":7,"text":"Segundo o manual de Nadador-Salvador (NS), consideram-se valores normais de glicemia em jejum os seguintes:","options":["110 e 126 mg/dl","70 e 110 mg/dl","40 e 70 mg/dl","126 e 180 mg/dl"],"correct":1},
+    {"chapter":7,"text":"A rutura de fibras musculares resultante de um esforço violento pode originar:","options":["Fratura","Hemorragia","Distensão","Traumatismo"],"correct":2},
+    {"chapter":7,"text":"Nas hemorragias, o local onde o vaso se rompe e por onde sai o sangue, designa-se por:","options":["Ponto de compressão direto","Válvula hemorrágica","Ponto de compressão indireto","Foco hemorrágico"],"correct":3},
+    {"chapter":7,"text":"Quando o diâmetro da artéria coronária diminui pela decomposição de placas de gordura e outras substâncias originando uma redução da chegada de oxigénio às células do miocárdio, a jusante dessa obstrução, dá-se:","options":["Convulsão","Epilepsia","Choque","Angina de peito"],"correct":3},
+    {"chapter":7,"text":"Como se classifica o episódio de insuficiência circulatória aguda?","options":["Convulsão","Choque","Epilepsia","Traumatismo"],"correct":1},
+    {"chapter":7,"text":"O deslocamento repentino e duradouro parcial ou completo de um ou mais ossos de uma articulação designa-se de:","options":["Luxação","Fratura","Cãibra","Distensão"],"correct":0},
+    {"chapter":7,"text":"\"A ansiedade, a irritabilidade e mesmo a agitação, a sensação de fome, o pulso rápido e fraco, a pele pálida, húmida e sudorese\". Esta sintomatologia está associada a que acidente?","options":["Hiperglicemia","Estado de choque","Hipoglicemia","Insolação"],"correct":2},
+    {"chapter":7,"text":"O Grande Mal Epilético, caracteriza-se por quantas fazes?","options":["3","5","4","6"],"correct":2},
+    {"chapter":8,"text":"A quem compete certificar e emitir o cartão de identificação do Nadador-Salvador (NS)?","options":["Escola de Autoridade Marítima (EAM)","Instituto de Socorros a Náufragos (ISN)","Escolas de Formação Profissionais de Nadadores-Salvadores (EFPNS)","Associações de Nadadores-Salvadores (ANS)"],"correct":1},
+    {"chapter":8,"text":"Qual a validade da categoria de Nadador-Salvador (NS)?","options":["4 Anos","5 Anos","3 Anos","Vitalício"],"correct":2},
+    {"chapter":8,"text":"A quem compete emitir os certificados de Nadador-Salvador (NS)?","options":["À Escola de Autoridade Marítima (EAM) ou estabelecimento de ensino reconhecido","Ao Instituto de Socorros a Náufragos (ISN)","Ao Formador do curso","Às Associações de Nadadores-Salvadores (ANS)"],"correct":0}
+  ];
+
+  const PASS = 15;
+  const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
+  const shuffleOptions = q => {
+    const idx = shuffle([0,1,2,3]);
+    return { ...q, options: idx.map(i => q.options[i]), correct: idx.indexOf(q.correct) };
+  };
+
+  function Timer({ seconds }) {
+    const m = String(Math.floor(seconds/60)).padStart(2,"0");
+    const s = String(seconds%60).padStart(2,"0");
+    return <div className={"quiz-timer"+(seconds<120?" warning":"")}>⏱ {m}:{s}</div>;
+  }
+
+  function QuizView({ questions, isExam, onFinish, onBack }) {
+    const [shuffled] = useState(() => questions.map(shuffleOptions));
+    const [current, setCurrent] = useState(0);
+    const [selected, setSelected] = useState(null);
+    const [confirmed, setConfirmed] = useState(false);
+    const [answers, setAnswers] = useState([]);
+    const [seconds, setSeconds] = useState(isExam ? 20*60 : 0);
+    const answersRef = useRef(answers);
+    answersRef.current = answers;
+
+    useEffect(() => {
+      if (!isExam) return;
+      if (seconds <= 0) { onFinish(answersRef.current); return; }
+      const t = setInterval(() => setSeconds(s => s-1), 1000);
+      return () => clearInterval(t);
+    }, [isExam, seconds]);
+
+    const q = shuffled[current];
+    const total = shuffled.length;
+    const letters = ["A","B","C","D"];
+
+    const confirm = () => {
+      if (selected === null) return;
+      if (isExam) {
+        const newAns = [...answers, { question: q, chosen: selected }];
+        if (current+1 >= total) { onFinish(newAns); return; }
+        setAnswers(newAns); setCurrent(c => c+1); setSelected(null); setConfirmed(false);
+      } else { setConfirmed(true); }
+    };
+    const next = () => {
+      const newAns = [...answers, { question: q, chosen: selected }];
+      if (current+1 >= total) { onFinish(newAns); return; }
+      setAnswers(newAns); setCurrent(c => c+1); setSelected(null); setConfirmed(false);
+    };
+
+    return (
+      <div>
+        <div className="quiz-header">
+          <div>
+            <div className="quiz-progress-text">Pergunta</div>
+            <div className="quiz-progress-num">{current+1} / {total}</div>
+          </div>
+          {isExam && <Timer seconds={seconds} />}
+        </div>
+        <div className="progress-bar"><div className="progress-fill" style={{width:((current+1)/total*100)+"%"}} /></div>
+        <div className="question-card">
+          <div className="question-label">Pergunta {current+1}</div>
+          <div className="question-text">{q.text}</div>
+        </div>
+        <div className="options">
+          {q.options.map((opt,i) => {
+            let cls = "option-btn";
+            if (confirmed) { if (i===q.correct) cls+=" correct"; else if (i===selected) cls+=" wrong"; }
+            else if (i===selected) cls+=" selected";
+            return (
+              <button key={i} className={cls} onClick={() => !confirmed && setSelected(i)} disabled={confirmed}>
+                <span className="option-letter">{letters[i]}</span>
+                <span>{opt}</span>
+              </button>
+            );
+          })}
+        </div>
+        {confirmed && !isExam && (
+          <div className={"feedback "+(selected===q.correct?"correct":"wrong")}>
+            {selected===q.correct ? "✅ Resposta correta!" : "❌ Errada. Certa: "+letters[q.correct]}
+          </div>
+        )}
+        <div className="quiz-actions">
+          <button className="btn btn-secondary" onClick={onBack}>Sair</button>
+          {!confirmed
+            ? <button className="btn btn-primary" onClick={confirm} disabled={selected===null}>Confirmar</button>
+            : !isExam && <button className="btn btn-primary" onClick={next}>{current+1>=total?"Ver Resultados":"Próxima →"}</button>
+          }
+        </div>
+      </div>
+    );
+  }
+
+  function ResultsView({ answers, isExam, onRetry, onHome }) {
+    const correct = answers.filter(a => a.chosen===a.question.correct).length;
+    const total = answers.length;
+    const pct = Math.round(correct/total*100);
+    const passed = isExam ? correct>=PASS : pct>=70;
+    const letters = ["A","B","C","D"];
+    return (
+      <div>
+        <div className="results-hero">
+          <div className="results-label">{isExam?"Simulação de Exame":"Treino por Capítulo"}</div>
+          <div className="results-score">{pct}%</div>
+          <div className="results-verdict" style={{color:passed?"var(--success)":"var(--error)"}}>
+            {passed?"🎉 Aprovado!":"📚 Continua a estudar"}
+          </div>
+          {isExam && <div style={{fontSize:"0.78rem",color:"var(--muted)",marginTop:6}}>Mínimo para aprovação: {PASS}/20</div>}
+        </div>
+        <div className="results-grid">
+          <div className="result-stat"><div className="result-stat-val" style={{color:"var(--success)"}}>{correct}</div><div className="result-stat-label">Certas</div></div>
+          <div className="result-stat"><div className="result-stat-val" style={{color:"var(--error)"}}>{total-correct}</div><div className="result-stat-label">Erradas</div></div>
+          <div className="result-stat"><div className="result-stat-val" style={{color:"var(--amber)"}}>{total}</div><div className="result-stat-label">Total</div></div>
+        </div>
+        <div className="review-title">📋 Revisão das Respostas</div>
+        {answers.map((a,i) => {
+          const right = a.chosen===a.question.correct;
+          return (
+            <div className="review-item" key={i}>
+              <div className="review-q">{i+1}. {a.question.text}</div>
+              {!right && <div className="review-answer wrong">✗ Escolheste: {letters[a.chosen]} – {a.question.options[a.chosen]}</div>}
+              <div className="review-answer correct">✓ Correta: {letters[a.question.correct]} – {a.question.options[a.question.correct]}</div>
+            </div>
+          );
+        })}
+        <div className="quiz-actions" style={{marginTop:20}}>
+          <button className="btn btn-secondary" onClick={onHome}>Início</button>
+          <button className="btn btn-primary" onClick={onRetry}>🔄 Repetir</button>
+        </div>
+      </div>
+    );
+  }
+
+  function CustomExamView({ counts, onStart, onBack }) {
+    const [selected, setSelected] = useState([]);
+    const toggle = ci => setSelected(s => s.includes(ci) ? s.filter(x=>x!==ci) : [...s,ci]);
+    const total = CHAPTERS.reduce((acc,_,ci) => selected.includes(ci) ? acc+counts[ci] : acc, 0);
+    return (
+      <div>
+        <div className="section-title">Escolher Capítulos</div>
+        <div className="section-sub">Seleciona os capítulos para o teu exame de 20 perguntas</div>
+        <div className="select-actions">
+          <div className="select-hint">
+            {selected.length===0 ? "Nenhum capítulo selecionado"
+              : <>{selected.length} capítulo{selected.length>1?"s":""} · <span>{total} perguntas</span></>}
+          </div>
+          <div style={{display:"flex",gap:8}}>
+            <button className="btn btn-secondary btn-sm" onClick={() => setSelected(CHAPTERS.map((_,i)=>i))}>Todos</button>
+            <button className="btn btn-secondary btn-sm" onClick={() => setSelected([])}>Limpar</button>
+          </div>
+        </div>
+        <div className="chapter-select-grid">
+          {CHAPTERS.map((c,ci) => {
+            const has = counts[ci]>0;
+            const sel = selected.includes(ci);
+            return (
+              <div key={ci} className={"chapter-select-item"+(sel?" selected":"")}
+                onClick={() => has && toggle(ci)}
+                style={!has?{opacity:0.4,cursor:"not-allowed"}:{}}>
+                <div className="chapter-select-check">{sel?"✓":""}</div>
+                <div>
+                  <div className="chapter-select-name">{c.split("–")[1]?.trim()||c}</div>
+                  <div className="chapter-select-count">{counts[ci]} perguntas</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        {total>0 && total<20 && <div className="warning-box">⚠️ Precisas de pelo menos 20 perguntas. Faltam {20-total}.</div>}
+        <div className="quiz-actions">
+          <button className="btn btn-secondary" onClick={onBack}>← Voltar</button>
+          <button className="btn btn-primary" onClick={() => onStart(selected)} disabled={selected.length===0||total<20}>🚀 Iniciar Exame</button>
+        </div>
+      </div>
+    );
+  }
+
+  function App() {
+    const [view, setView] = useState("home");
+    const [quizQs, setQuizQs] = useState([]);
+    const [isExam, setIsExam] = useState(false);
+    const [answers, setAnswers] = useState([]);
+    const [selChapter, setSelChapter] = useState(null);
+
+    const counts = CHAPTERS.map((_,ci) => QUESTIONS.filter(q=>q.chapter===ci).length);
+
+    const startExam = () => {
+      setIsExam(true); setQuizQs(shuffle(QUESTIONS).slice(0,20)); setView("quiz");
+    };
+    const startCustomExam = sel => {
+      const pool = QUESTIONS.filter(q=>sel.includes(q.chapter));
+      setIsExam(true); setQuizQs(shuffle(pool).slice(0,20)); setView("quiz");
+    };
+    const startChapter = ci => {
+      const qs = QUESTIONS.filter(q=>q.chapter===ci);
+      if (!qs.length) return;
+      setIsExam(false); setSelChapter(ci); setQuizQs(shuffle(qs)); setView("quiz");
+    };
+
+    return (
+      <div className="app">
+        <nav className="nav">
+          <div className="nav-logo">
+            <div className="nav-logo-icon">🌊</div>
+            <span>Nadador Salvador</span>
+          </div>
+        </nav>
+        <main className="main">
+          {view==="home" && (
+            <div className="home-hero">
+              <div className="home-wave">🏖️</div>
+              <div className="home-title">Exame Teórico</div>
+              <div className="home-title" style={{marginTop:-6}}>Nadador Salvador</div>
+              <div className="home-sub">Prepara-te para o exame com simulações e estudo por capítulo</div>
+              <div className="home-cards">
+                <div className="mode-card" onClick={() => setView("customExam")}>
+                  <div className="mode-card-icon">🎯</div>
+                  <div className="mode-card-title">Escolher Capítulos</div>
+                  <div className="mode-card-desc">Seleciona os capítulos que queres, 20 perguntas aleatórias, 20 minutos</div>
+                </div>
+                <div className="mode-card" onClick={() => setView("chapters")}>
+                  <div className="mode-card-icon">📚</div>
+                  <div className="mode-card-title">Por Capítulo</div>
+                  <div className="mode-card-desc">Estuda capítulo a capítulo ao teu ritmo</div>
+                </div>
+                <div className="mode-card" onClick={startExam}>
+                  <div className="mode-card-icon">📝</div>
+                  <div className="mode-card-title">Simulação de Exame</div>
+                  <div className="mode-card-desc">20 perguntas aleatórias de todos os capítulos, 20 minutos</div>
+                </div>
+              </div>
+              <div className="stats-bar">
+                <div className="stat">📋 <span className="stat-val">{QUESTIONS.length}</span> perguntas</div>
+                <div className="stat">📑 <span className="stat-val">{CHAPTERS.filter((_,i)=>counts[i]>0).length}/9</span> capítulos</div>
+                <div className="stat">✅ Aprovação: <span className="stat-val">{PASS}/20</span></div>
+              </div>
+            </div>
+          )}
+          {view==="chapters" && (
+            <div>
+              <div className="section-title">Escolhe um Capítulo</div>
+              <div className="section-sub">Seleciona o tema que queres treinar</div>
+              <div className="chapter-list">
+                {CHAPTERS.map((c,ci) => (
+                  <div className="chapter-item" key={ci} onClick={() => startChapter(ci)}>
+                    <div className="chapter-item-left">
+                      <div className="chapter-num">{ci+1}</div>
+                      <div>
+                        <div className="chapter-name">{c.split("–")[1]?.trim()||c}</div>
+                        <div className="chapter-count">{counts[ci]} perguntas</div>
+                      </div>
+                    </div>
+                    <span className="chapter-arrow">›</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{marginTop:18}}><button className="btn btn-secondary" onClick={() => setView("home")}>← Voltar</button></div>
+            </div>
+          )}
+          {view==="customExam" && <CustomExamView counts={counts} onStart={startCustomExam} onBack={() => setView("home")} />}
+          {view==="quiz" && <QuizView questions={quizQs} isExam={isExam} onFinish={ans => { setAnswers(ans); setView("results"); }} onBack={() => setView(isExam?"home":"chapters")} />}
+          {view==="results" && <ResultsView answers={answers} isExam={isExam} onRetry={() => isExam ? startExam() : startChapter(selChapter)} onHome={() => setView("home")} />}
+        </main>
+      </div>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
