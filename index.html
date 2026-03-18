@@ -112,6 +112,19 @@
     .select-actions { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
     .select-hint { font-size: 0.85rem; color: var(--muted); }
     .select-hint span { color: var(--amber); font-weight: 600; }
+    .tab-bar { display: flex; gap: 8px; margin-bottom: 20px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 5px; }
+    .tab-btn { flex: 1; padding: 9px 8px; border: none; border-radius: 10px; font-family: var(--font); font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all .15s; background: transparent; color: var(--muted); }
+    .tab-btn.active { background: var(--orange); color: white; }
+    .sbv-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .sbv-info-card { background: var(--card); border: 1px solid #1E3A5F; border-radius: var(--radius); padding: 16px; }
+    .sbv-info-label { font-size: 0.68rem; color: #4A7FA5; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+    .sbv-info-value { font-size: 1rem; font-weight: 700; color: var(--text); line-height: 1.4; }
+    .sbv-info-card-full { background: var(--card); border: 1px solid #1E3A5F; border-radius: var(--radius); padding: 16px; margin-bottom: 10px; }
+    .sbv-toggle { display:flex; align-items:center; gap:8px; padding:10px 16px; background:var(--card); border:2px solid var(--border); border-radius:var(--radius); cursor:pointer; transition:all .15s; user-select:none; }
+    .sbv-toggle.on { background:#0D1E35; border-color:#3B82F6; }
+    .sbv-checkbox { width:18px; height:18px; border-radius:4px; border:2px solid var(--border); background:transparent; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .15s; }
+    .sbv-toggle.on .sbv-checkbox { background:#3B82F6; border-color:#3B82F6; }
+    .btn-blue { background: linear-gradient(135deg,#1D4ED8,#3B82F6); border: none; color: white; }
     .warning-box { background: #2E1A08; border: 1px solid var(--amber); border-radius: var(--radius); padding: 12px 16px; font-size: 0.85rem; color: var(--amber); margin-bottom: 16px; }
     .score-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 16px 20px; text-align: center; margin-bottom: 16px; position: relative; overflow: hidden; }
     .score-card::before { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 0%, rgba(240,106,26,0.12) 0%, transparent 70%); pointer-events: none; }
@@ -785,9 +798,12 @@
           {view==="home" && (
             <div className="home-hero">
               <div className="home-wave">🏖️</div>
-              <div className="home-title">Exame Teórico</div>
-              <div className="home-title" style={{marginTop:-6}}>Nadador Salvador</div>
+              <div className="home-title">Nadador Salvador</div>
               <div className="home-sub">Prepara-te para o exame com simulações e estudo por capítulo</div>
+              <div className="tab-bar">
+                <button className="tab-btn active">📚 Teórico</button>
+                <button className="tab-btn" onClick={() => setView("sbv")}>🚑 SBV</button>
+              </div>
 
               <div className="home-cards">
                 <div className="mode-card" onClick={() => setView("customExam")}>
@@ -864,7 +880,175 @@
             else startExam();
           }} onHome={() => setView("home")} />}
           {view==="stats" && <StatsView onBack={() => setView("home")} stats={stats} setStats={setStats} />}
+          {view==="sbv" && <ScenarioGenerator onBack={() => setView("home")} />}
         </main>
+      </div>
+    );
+  }
+
+  // ── SBV GERADOR ───────────────────────────────────────────────
+  const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+
+  const LOCAIS = [
+    { nome:"Praia de Caxias",                tipo:"marítima", municipio:"Oeiras"          },
+    { nome:"Praia do Guincho",               tipo:"marítima", municipio:"Cascais"         },
+    { nome:"Praia de Matosinhos",            tipo:"marítima", municipio:"Matosinhos"      },
+    { nome:"Praia da Nazaré",                tipo:"marítima", municipio:"Nazaré"          },
+    { nome:"Praia da Rocha",                 tipo:"marítima", municipio:"Portimão"        },
+    { nome:"Praia da Figueira da Foz",       tipo:"marítima", municipio:"Figueira da Foz" },
+    { nome:"Praia de Mira",                  tipo:"marítima", municipio:"Mira"            },
+    { nome:"Praia de Cascais",               tipo:"marítima", municipio:"Cascais"         },
+    { nome:"Praia de Sesimbra",              tipo:"marítima", municipio:"Sesimbra"        },
+    { nome:"Praia da Comporta",              tipo:"marítima", municipio:"Alcácer do Sal"  },
+    { nome:"Praia de Albufeira",             tipo:"marítima", municipio:"Albufeira"       },
+    { nome:"Praia da Falésia",               tipo:"marítima", municipio:"Albufeira"       },
+    { nome:"Praia de Vilamoura",             tipo:"marítima", municipio:"Loulé"           },
+    { nome:"Praia de Sagres",                tipo:"marítima", municipio:"Vila do Bispo"   },
+    { nome:"Praia de Odeceixe",              tipo:"marítima", municipio:"Aljezur"         },
+    { nome:"Praia do Camilo",                tipo:"marítima", municipio:"Lagos"           },
+    { nome:"Praia de Manta Rota",            tipo:"marítima", municipio:"Vila Real de St. António" },
+    { nome:"Praia da Ilha de Tavira",        tipo:"marítima", municipio:"Tavira"          },
+    { nome:"Praia de Ofir",                  tipo:"marítima", municipio:"Esposende"       },
+    { nome:"Praia de Esposende",             tipo:"marítima", municipio:"Esposende"       },
+    { nome:"Praia de Viana do Castelo",      tipo:"marítima", municipio:"Viana do Castelo"},
+    { nome:"Praia de Moledo",                tipo:"marítima", municipio:"Caminha"         },
+    { nome:"Praia de Espinho",               tipo:"marítima", municipio:"Espinho"         },
+    { nome:"Praia de Miramar",               tipo:"marítima", municipio:"Vila Nova de Gaia"},
+    { nome:"Praia da Granja",                tipo:"marítima", municipio:"Vila Nova de Gaia"},
+    { nome:"Praia de São Pedro de Moel",     tipo:"marítima", municipio:"Marinha Grande"  },
+    { nome:"Praia da Vieira de Leiria",      tipo:"marítima", municipio:"Marinha Grande"  },
+    { nome:"Praia de Peniche",               tipo:"marítima", municipio:"Peniche"         },
+    { nome:"Praia de Baleal",                tipo:"marítima", municipio:"Peniche"         },
+    { nome:"Praia de Ericeira",              tipo:"marítima", municipio:"Mafra"           },
+    { nome:"Praia Grande do Rodízio",        tipo:"marítima", municipio:"Sintra"          },
+    { nome:"Praia de Setúbal",               tipo:"marítima", municipio:"Setúbal"         },
+    { nome:"Praia de Tróia",                 tipo:"marítima", municipio:"Grândola"        },
+    { nome:"Praia Fluvial de Adaúfe",        tipo:"fluvial",  municipio:"Braga"           },
+    { nome:"Praia Fluvial do Alamal",        tipo:"fluvial",  municipio:"Chamusca"        },
+    { nome:"Praia Fluvial de Amieira",       tipo:"fluvial",  municipio:"Mação"           },
+    { nome:"Praia Fluvial de Constância",    tipo:"fluvial",  municipio:"Constância"      },
+    { nome:"Praia Fluvial do Cabril",        tipo:"fluvial",  municipio:"Pedrogão Grande" },
+    { nome:"Piscinas do Jamor",              tipo:"piscina",  municipio:"Oeiras"          },
+    { nome:"Piscinas Municipais de Lisboa",  tipo:"piscina",  municipio:"Lisboa"          },
+    { nome:"Piscina Olímpica do Porto",      tipo:"piscina",  municipio:"Porto"           },
+    { nome:"Piscinas de Braga",              tipo:"piscina",  municipio:"Braga"           },
+    { nome:"Piscinas Municipais de Coimbra", tipo:"piscina",  municipio:"Coimbra"         },
+  ];
+
+  const VITIMAS = [
+    { idade:"3 meses",  sexo:"masculino", tipo:"lactente"   },
+    { idade:"6 meses",  sexo:"feminino",  tipo:"lactente"   },
+    { idade:"8 meses",  sexo:"masculino", tipo:"lactente"   },
+    { idade:"10 meses", sexo:"feminino",  tipo:"lactente"   },
+    { idade:"1 ano",    sexo:"masculino", tipo:"lactente"   },
+    { idade:"2 anos",   sexo:"feminino",  tipo:"pediatrico" },
+    { idade:"3 anos",   sexo:"masculino", tipo:"pediatrico" },
+    { idade:"4 anos",   sexo:"feminino",  tipo:"pediatrico" },
+    { idade:"5 anos",   sexo:"masculino", tipo:"pediatrico" },
+    { idade:"6 anos",   sexo:"feminino",  tipo:"pediatrico" },
+    { idade:"7 anos",   sexo:"masculino", tipo:"pediatrico" },
+    { idade:"8 anos",   sexo:"feminino",  tipo:"pediatrico" },
+    { idade:"9 anos",   sexo:"masculino", tipo:"pediatrico" },
+    { idade:"10 anos",  sexo:"feminino",  tipo:"pediatrico" },
+    { idade:"12 anos",  sexo:"masculino", tipo:"pediatrico" },
+    { idade:"16 anos",  sexo:"masculino", tipo:"adulto"     },
+    { idade:"18 anos",  sexo:"feminino",  tipo:"adulto"     },
+    { idade:"20 anos",  sexo:"masculino", tipo:"adulto"     },
+    { idade:"22 anos",  sexo:"feminino",  tipo:"adulto"     },
+    { idade:"25 anos",  sexo:"feminino",  tipo:"adulto", especial:"grávida" },
+    { idade:"28 anos",  sexo:"feminino",  tipo:"adulto", especial:"grávida" },
+    { idade:"30 anos",  sexo:"masculino", tipo:"adulto"     },
+    { idade:"35 anos",  sexo:"feminino",  tipo:"adulto"     },
+    { idade:"40 anos",  sexo:"masculino", tipo:"adulto"     },
+    { idade:"45 anos",  sexo:"feminino",  tipo:"adulto"     },
+    { idade:"50 anos",  sexo:"masculino", tipo:"adulto"     },
+    { idade:"55 anos",  sexo:"feminino",  tipo:"adulto"     },
+    { idade:"60 anos",  sexo:"masculino", tipo:"adulto"     },
+    { idade:"65 anos",  sexo:"feminino",  tipo:"adulto"     },
+    { idade:"68 anos",  sexo:"masculino", tipo:"adulto"     },
+    { idade:"72 anos",  sexo:"feminino",  tipo:"adulto"     },
+    { idade:"75 anos",  sexo:"masculino", tipo:"adulto"     },
+    { idade:"78 anos",  sexo:"feminino",  tipo:"adulto"     },
+    { idade:"80 anos",  sexo:"masculino", tipo:"adulto", especial:"O\u2082 domiciliário" },
+    { idade:"83 anos",  sexo:"feminino",  tipo:"adulto", especial:"O\u2082 domiciliário" },
+    { idade:"85 anos",  sexo:"masculino", tipo:"adulto"     },
+  ];
+
+  function ScenarioGenerator({ onBack }) {
+    const [vitima,  setVitima]  = useState(null);
+    const [local,   setLocal]   = useState(null);
+    const [tipos,   setTipos]   = useState(["adulto","pediatrico","lactente"]);
+
+    const toggleTipo = t => setTipos(s => s.includes(t) ? s.filter(x=>x!==t) : [...s,t]);
+
+    const generate = () => {
+      const pool = VITIMAS.filter(v => tipos.includes(v.tipo));
+      if (!pool.length) return;
+      setVitima(pick(pool));
+      setLocal(pick(LOCAIS));
+    };
+
+    const TIPO_LABELS = [
+      { id:"adulto",     label:"Adulto",     icon:"🧑" },
+      { id:"pediatrico", label:"Pediátrico", icon:"🧒" },
+      { id:"lactente",   label:"Lactente",   icon:"👶" },
+    ];
+
+    return (
+      <div>
+        <div style={{color:"#93C5FD",fontSize:"0.75rem",fontWeight:700,textTransform:"uppercase",letterSpacing:"1px",marginBottom:4}}>Gerador</div>
+        <div style={{color:"var(--text)",fontSize:"1.3rem",fontWeight:800,marginBottom:4}}>🚑 Vítima SBV</div>
+        <div style={{color:"var(--muted)",fontSize:"0.85rem",marginBottom:20}}>Gera uma vítima e localização aleatórias</div>
+
+        {/* Type filter */}
+        <div style={{marginBottom:20}}>
+          <div style={{fontSize:"0.72rem",color:"#4A7FA5",fontWeight:700,textTransform:"uppercase",letterSpacing:"1px",marginBottom:10}}>Tipo de vítima</div>
+          <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+            {TIPO_LABELS.map(t => {
+              const on = tipos.includes(t.id);
+              return (
+                <div key={t.id} onClick={() => toggleTipo(t.id)}
+                  className={"sbv-toggle"+(on?" on":"")}>
+                  <div className="sbv-checkbox">
+                    {on && <span style={{color:"white",fontSize:"0.65rem",fontWeight:800}}>✓</span>}
+                  </div>
+                  <span style={{fontSize:"0.82rem",fontWeight:700,color:on?"#93C5FD":"#4A7FA5"}}>{t.icon} {t.label}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <button className="btn btn-blue" style={{width:"100%",padding:"15px",fontSize:"1rem",marginBottom:24,borderRadius:"var(--radius)"}}
+          onClick={generate} disabled={tipos.length===0}>
+          🎲 Gerar Vítima
+        </button>
+
+        {vitima && local && (
+          <>
+            {/* Local — full width */}
+            <div className="sbv-info-card-full">
+              <div className="sbv-info-label">📍 Local</div>
+              <div className="sbv-info-value">{local.nome} ({local.municipio})</div>
+              <div style={{fontSize:"0.75rem",color:"var(--muted)",marginTop:4,textTransform:"capitalize"}}>Praia {local.tipo}</div>
+            </div>
+
+            {/* Sexo + Idade side by side */}
+            <div className="sbv-info-grid">
+              <div className="sbv-info-card">
+                <div className="sbv-info-label">👤 Sexo</div>
+                <div className="sbv-info-value">{vitima.sexo === "feminino" ? "Feminino" : "Masculino"}</div>
+              </div>
+              <div className="sbv-info-card">
+                <div className="sbv-info-label">🎂 Idade</div>
+                <div className="sbv-info-value">{vitima.idade}</div>
+                {vitima.especial && <div style={{fontSize:"0.75rem",color:"var(--amber)",marginTop:4}}>⚠️ {vitima.especial}</div>}
+              </div>
+            </div>
+          </>
+        )}
+
+        <button className="btn btn-secondary" style={{width:"100%",marginTop:4}} onClick={onBack}>← Voltar</button>
       </div>
     );
   }
