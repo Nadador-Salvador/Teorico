@@ -850,7 +850,7 @@
                 </div>
               </div>
             </div>
-            <div style={{textAlign:"right",fontSize:"0.7rem",color:"#2A2A2A",marginTop:8,paddingBottom:4,userSelect:"none"}}>Made by Nel</div>
+            <MadeByBtn />
           </> )}
           {view==="chapters" && (
             <div>
@@ -1051,6 +1051,52 @@
 
         <button className="btn btn-secondary" style={{width:"100%",marginTop:4}} onClick={onBack}>← Voltar</button>
       </div>
+    );
+  }
+
+  function MadeByBtn() {
+    const [open, setOpen] = useState(false);
+    return (
+      <>
+        <div style={{textAlign:"right",marginTop:8,paddingBottom:4}}>
+          <button onClick={() => setOpen(true)}
+            style={{background:"none",border:"none",color:"#3A3A3A",fontSize:"0.78rem",cursor:"pointer",fontFamily:"var(--font)",userSelect:"none",padding:"6px 2px"}}>
+            Made by Manel
+          </button>
+        </div>
+        {open && (
+          <div style={{position:"fixed",inset:0,background:"#000a",zIndex:999,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}
+            onClick={() => setOpen(false)}>
+            <div style={{background:"var(--card)",border:"1px solid var(--border)",borderRadius:"var(--radius)",padding:24,maxWidth:320,width:"100%"}}
+              onClick={e => e.stopPropagation()}>
+              <div style={{textAlign:"center",marginBottom:20}}>
+                <div style={{fontSize:"2.5rem",marginBottom:8}}>🌊</div>
+                <div style={{fontWeight:800,fontSize:"1.1rem",color:"var(--text)"}}>Nadador Salvador</div>
+                <div style={{fontSize:"0.75rem",color:"var(--muted)",marginTop:2}}>App de Estudo para o Exame</div>
+              </div>
+              <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:20}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",borderBottom:"1px solid var(--border)",paddingBottom:10}}>
+                  <span style={{fontSize:"0.78rem",color:"var(--muted)"}}>Autor</span>
+                  <span style={{fontSize:"0.85rem",fontWeight:700,color:"var(--text)"}}>Manel</span>
+                </div>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",borderBottom:"1px solid var(--border)",paddingBottom:10}}>
+                  <span style={{fontSize:"0.78rem",color:"var(--muted)"}}>Versão</span>
+                  <span style={{fontSize:"0.85rem",fontWeight:700,color:"var(--text)"}}>v0.8</span>
+                </div>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",borderBottom:"1px solid var(--border)",paddingBottom:10}}>
+                  <span style={{fontSize:"0.78rem",color:"var(--muted)"}}>Ano</span>
+                  <span style={{fontSize:"0.85rem",fontWeight:700,color:"var(--text)"}}>2026</span>
+                </div>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                  <span style={{fontSize:"0.78rem",color:"var(--muted)"}}>Contacto</span>
+                  <span style={{fontSize:"0.78rem",fontWeight:600,color:"var(--amber)"}}>infoapp.nadadorsalvador@gmail.com</span>
+                </div>
+              </div>
+              <button className="btn btn-secondary" style={{width:"100%"}} onClick={() => setOpen(false)}>Fechar</button>
+            </div>
+          </div>
+        )}
+      </>
     );
   }
 
