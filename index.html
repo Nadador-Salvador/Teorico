@@ -12,6 +12,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
@@ -78,7 +79,7 @@
     .feedback { border-radius: var(--radius); padding: 13px 16px; font-size: 0.92rem; font-weight: 500; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; line-height: 1.4; }
     .feedback.correct { background: #0D2E1A; border: 1px solid var(--success); color: #4ADE80; }
     .feedback.wrong { background: #2E0D0D; border: 1px solid var(--error); color: #F87171; }
-    .quiz-actions { display: flex; justify-content: flex-end; gap: 10px; }
+    .quiz-actions { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
     .btn { padding: 14px 22px; border-radius: 12px; font-family: var(--font); font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all .15s; border: none; display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 50px; }
     .btn-primary { background: var(--orange); color: #fff; }
     .btn-primary:active { background: #d45a14; transform: scale(0.97); }
@@ -112,8 +113,8 @@
     .select-actions { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
     .select-hint { font-size: 0.85rem; color: var(--muted); }
     .select-hint span { color: var(--amber); font-weight: 600; }
-    .tab-bar { display: flex; gap: 8px; margin-bottom: 20px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 5px; }
-    .tab-btn { flex: 1; padding: 9px 8px; border: none; border-radius: 10px; font-family: var(--font); font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all .15s; background: transparent; color: var(--muted); }
+    .tab-bar { display: flex; gap: 6px; margin-bottom: 20px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 5px; }
+    .tab-btn { flex: 1 1 0; min-width: 0; line-height: 1.25; text-align: center; padding: 9px 6px; border: none; border-radius: 10px; font-family: var(--font); font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: all .15s; background: transparent; color: var(--muted); }
     .tab-btn.active { background: var(--orange); color: white; }
     .sbv-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
     .sbv-info-card { background: var(--card); border: 1px solid #1E3A5F; border-radius: var(--radius); padding: 16px; }
@@ -152,6 +153,31 @@
     .pts-earned { background: var(--card); border: 1px solid var(--amber); border-radius: var(--radius); padding: 13px 16px; text-align: center; margin-bottom: 16px; }
     .pts-earned-val { font-size: 1.8rem; font-weight: 800; color: var(--amber); }
     .pts-earned-label { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+    .ct-input { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; color: var(--text); font-family: var(--font); font-size: 16px; margin-bottom: 12px; }
+    .ct-input:focus { outline: none; border-color: var(--orange); }
+    .ct-opts { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+    .ct-label { display: flex; align-items: center; gap: 9px; font-size: 0.85rem; color: var(--text); cursor: pointer; }
+    .ct-check { width: 20px; height: 20px; accent-color: var(--orange); flex-shrink: 0; cursor: pointer; }
+    .ct-chapter { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 9px; overflow: hidden; }
+    .ct-chapter-head { display: flex; align-items: center; gap: 12px; padding: 12px 13px; min-height: 60px; }
+    .ct-chapter-info { flex: 1; min-width: 0; }
+    .ct-q { display: flex; align-items: flex-start; gap: 12px; padding: 12px 13px; border-top: 1px solid var(--border); cursor: pointer; }
+    .ct-q-text { font-size: 0.85rem; line-height: 1.45; }
+    .ct-q-ans { font-size: 0.75rem; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+    .ct-field-label { display: block; font-size: 0.75rem; color: var(--muted); margin: 0 0 5px 2px; }
+    .ct-q-opts { margin-top: 6px; display: flex; flex-direction: column; gap: 4px; }
+    .ct-q-opt { font-size: 0.78rem; line-height: 1.4; color: var(--muted); padding: 5px 8px; border-radius: 8px; }
+    .ct-q-opt.right { color: #6FD38C; background: rgba(111,211,140,0.12); font-weight: 600; }
+    .ct-q-more { background: none; border: none; color: var(--amber); font-family: var(--font); font-size: 0.75rem; font-weight: 600; padding: 8px 0 2px; cursor: pointer; }
+    .ct-pos { flex-shrink: 0; align-self: flex-start; background: var(--orange); color: #fff; border-radius: 999px; font-size: 0.72rem; font-weight: 700; padding: 3px 9px; }
+    .btn.shuffled { background: var(--orange); color: #fff; border-color: var(--orange); }
+    .ct-flash { background: #2E1A08; border: 1px solid var(--orange); color: var(--amber); border-radius: 12px; padding: 10px 14px; font-size: 0.85rem; margin-bottom: 14px; animation: ctFlash 2.4s ease forwards; }
+    @keyframes ctFlash { 0% { opacity: 0; transform: translateY(-4px); } 10% { opacity: 1; transform: none; } 80% { opacity: 1; } 100% { opacity: 0; } }
+    .ct-bar { position: sticky; bottom: 0; z-index: 50; background: var(--bg); border-top: 1px solid var(--border); padding: 12px 0 calc(12px + env(safe-area-inset-bottom, 0px)); margin-top: 12px; }
+    .ct-count { font-size: 0.85rem; color: var(--muted); margin-bottom: 10px; }
+    .ct-count span { color: var(--amber); font-weight: 700; }
+    .ct-bar-btns { display: flex; gap: 10px; }
+    .ct-bar-btns .btn { flex: 1; padding: 12px 10px; }
     /* Score card home - responsive */
     .score-card-home-stats { display: flex; gap: 16px; border-left: 1px solid var(--border); padding-left: 16px; flex-shrink: 0; }
     @media(max-width: 360px) {
@@ -174,7 +200,7 @@
     "Capítulo 5 – Piscinas",
     "Capítulo 6 – O Salvamento",
     "Capítulo 7 – Socorro ao Náufrago",
-    "Capítulo 8 – Acidente Frequentes em Praias e Piscinas",
+    "Capítulo 8 – Acidentes Frequentes em Praias e Piscinas",
     "Capítulo 9 – Perguntas Extra"
   ];
 
@@ -241,7 +267,7 @@
     {"chapter":1,"text":"Ter especial atenção a crianças, idosos, pessoas portadoras de deficiência e outras não habituadas ao mar, (…) não deve ultrapassar os limites das suas qualificações e competências, devendo respeitar as hierarquias técnicas, estamos a falar de:","options":["Direitos do Nadador-Salvador (NS)","Deveres gerais do Nadador-Salvador (NS)","Deveres do Nadador-Salvador (NS)","Recomendações do Nadador-Salvador (NS)"],"correct":3},
     {"chapter":1,"text":"O Nadador-salvador (NS) é a pessoa singular habilitada com o curso de NS certificado ou reconhecido pelo Instituto de Socorros a Náufragos (ISN), a quem compete, para além dos conteúdos técnicos profissionais específicos:","options":["Informar, prevenir, socorrer e prestar o Suporte Básico de Vida (SBV) com obrigatoriedade de vigilância","Informar, prevenir, socorrer em piscinas e outros locais onde ocorram práticas aquáticas com obrigatoriedade de vigilância","Informar, prevenir, socorrer e prestar o Suporte Básico de Vida (SBV) em qualquer circunstância nas praias de banhos, em áreas concessionadas, em piscinas e outros locais onde ocorram práticas aquáticas com obrigatoriedade de vigilância","Informar, prevenir, socorrer e prestar o Suporte Básico de Vida (SBV) em qualquer circunstância nas praias de banhos, nos pavilhões ginásio e em piscinas com obrigatoriedade de vigilância"],"correct":2},
     {"chapter":2,"text":"Em que fase do afogamento, a vítima não faz qualquer tipo de movimento e continua a fazer grandes aspirações de água para o pulmão:","options":["Aspiração inicial de líquido","Apneia voluntária","Espasmo glótico","Apneia terminal"],"correct":2},
-    {"chapter":2,"text":"Na classificação de afogamento grau 3, como se apresenta o náufrago e quais os procedimentos a tomar:","options":["Pouca espuma na boca e/ou nariz, administrar oxigénio (O2) a 15litros/min, Posição Lateral de Segurança (PLS) e aquecimento corporal","Muita espuma na boca e/ou nariz com pulso periférico palpável, administrar oxigénio (O2) a 15litros/min no local do acidente, Posição Lateral de Segurança (PLS) e internamento hospitalar","Pouca espuma na boca e/ou nariz; administrar oxigénio (O2) nasal a 5litros/min, aquecimento corporal, repouso, tranquilização e observação hospitalar","Muita espuma na boca e/ou nariz sem pulso periférico palpável, administrar oxigénio (O2) a 15litros/min no local do acidente, Posição Lateral de Segurança (PLS) e internamento hospitalar"],"correct":1},
+    {"chapter":2,"text":"Na classificação de afogamento grau 3, como se apresenta o náufrago e quais os procedimentos a tomar:","options":["Pouca espuma na boca e/ou nariz, administrar oxigénio (O₂) a 15litros/min, Posição Lateral de Segurança (PLS) e aquecimento corporal","Muita espuma na boca e/ou nariz com pulso periférico palpável, administrar oxigénio (O₂) a 15litros/min no local do acidente, Posição Lateral de Segurança (PLS) e internamento hospitalar","Pouca espuma na boca e/ou nariz; administrar oxigénio (O₂) nasal a 5litros/min, aquecimento corporal, repouso, tranquilização e observação hospitalar","Muita espuma na boca e/ou nariz sem pulso periférico palpável, administrar oxigénio (O₂) a 15litros/min no local do acidente, Posição Lateral de Segurança (PLS) e internamento hospitalar"],"correct":1},
     {"chapter":2,"text":"O que é o afogamento?","options":["É o processo que resulta em insuficiência respiratória por imersão ou submersão em meio líquido","É o processo que resulta em insuficiência cardíaca por imersão ou submersão em meio líquido","É o processo que resulta em insuficiência cerebral por imersão ou submersão em meio líquido","É o processo que resulta em insuficiência cardiocelular por imersão ou submersão em meio líquido"],"correct":0},
     {"chapter":2,"text":"O organismo humano consegue sobreviver em situações adversas extremas e meios inóspitos, até cerca de:","options":["5 minutos sem oxigénio","5 minutos sem proteção e abrigo","3 minutos sem oxigénio e 3 horas sem proteção e abrigo","3 minutos sem oxigénio e 3 dias sem comida"],"correct":2},
     {"chapter":2,"text":"A hipoxia, ocorre devido a","options":["Oxigénio a mais no cérebro","Falta de sangue no cérebro","Diminuição de oxigénio no sangue","Oxigénio a mais no sangue"],"correct":2},
@@ -346,7 +372,7 @@
     {"chapter":6,"text":"O Nadador-Salvador (NS) encontra um banhista aparentemente inconsciente na praia, reúne as condições de segurança e avalia o estado de consciência. Como faz para a avaliação da função respiratória?","options":["AVDS","ABCDE","Permeabilização da via aérea e VOS","Avalia a função cardiocirculatória"],"correct":2},
     {"chapter":6,"text":"Numa vitima inconsciente, criança e sabendo que é uma obstrução grave da via aérea, o que deve fazer?","options":["Iniciar RCP","Dar 30:2","Dar 5 insuflações seguidas de 15:2","Ligar 112"],"correct":3},
     {"chapter":6,"text":"O Nadador-Salvador (NS) depara-se com um banhista em paragem respiratória e tem o kit de oxigenoterapia consigo. Que material deve utilizar?","options":["Mascara facial simples","Insuflador manual com balonete","Mascara facial composta","Todas as respostas estão corretas"],"correct":1},
-    {"chapter":6,"text":"Qual o débito que o Nadador-Salvador (NS) deve administrar utilizando os óculos nasais?","options":["Não utilizar débitos superiores a 5 litros/min de 02","Não utilizar débitos superiores a 10 litros/min de 02","Não utilizar débitos superiores a 15 litros/min de 02","Todas as respostas estão corretas"],"correct":0},
+    {"chapter":6,"text":"Qual o débito que o Nadador-Salvador (NS) deve administrar utilizando os óculos nasais?","options":["Não utilizar débitos superiores a 5 litros/min de O₂","Não utilizar débitos superiores a 10 litros/min de O₂","Não utilizar débitos superiores a 15 litros/min de O₂","Todas as respostas estão corretas"],"correct":0},
     {"chapter":6,"text":"Perante uma obstrução da via aérea grave numa criança, ficando esta inconsciente, o Nadador-Salvador (NS) deve:","options":["Permeabilizar a via aérea, dar 5 insuflações seguidas de 1 min de SBV","Teste VOS, dar 5 insuflações e observar sinais de vida","Ligar 112 e iniciar RCP (15:2)","Iniciar RCP"],"correct":2},
     {"chapter":6,"text":"Qual dos seguintes meios deve utilizar para administrar oxigénio por inalação?","options":["Máscara facial composta","Boca-a-boca","Insuflador manual com balonete","Todas as respostas estão corretas"],"correct":0},
     {"chapter":6,"text":"No grau 3 do afogamento e após a recuperação num adulto, qual a quantidade de oxigénio a administrar?","options":["15 l/min","10 l/min","5 l/min","3 l/min"],"correct":0},
@@ -369,20 +395,20 @@
     {"chapter":6,"text":"Qual a consequência ao aplicar ventilações muito rápidas e com muita força?","options":["Rebentamento dos alvéolos pulmonares","Fratura do esterno","Distensão gástrica","Excesso de oxigénio no sangue"],"correct":2},
     {"chapter":6,"text":"Perante que sinais e sintomas deverá o Nadador-Salvador (NS) administrar oxigénio?","options":["Nos casos de dispneia","Sempre que a vítima pedir","Intoxicação por GRAMOXONE","Em situações extremas"],"correct":0},
     {"chapter":6,"text":"Ao administrar oxigénio a uma vítima, o Nadador-Salvador (NS) deve considerar:","options":["A utilização de óculos nasais, sempre que a vítima esteja inconsciente","A utilização de máscara simples, para débitos de 10 l/min","A utilização de máscara composta para débitos de 10 l/min e 15 l/min","A utilização de máscara composta para débitos de 5 l/min"],"correct":2},
-    {"chapter":6,"text":"Quando utilizar o insuflador manual ligado a uma fonte de oxigénio (O2), o Nadador-Salvador (NS) deve considerar:","options":["Nunca utilizar o tubo orofaríngeo (Guedel)","Utilizar o tubo orofaríngeo apenas nos adultos","Nunca utilizar o tubo orofaríngeo nos bebés","Utilizar sempre o tubo orofaríngeo"],"correct":3},
+    {"chapter":6,"text":"Quando utilizar o insuflador manual ligado a uma fonte de oxigénio (O₂), o Nadador-Salvador (NS) deve considerar:","options":["Nunca utilizar o tubo orofaríngeo (Guedel)","Utilizar o tubo orofaríngeo apenas nos adultos","Nunca utilizar o tubo orofaríngeo nos bebés","Utilizar sempre o tubo orofaríngeo"],"correct":3},
     {"chapter":6,"text":"Em que situações o Nadador-Salvador (NS) deverá administrar 10 litros de oxigénio a uma criança?","options":["Hemorragias ligeiras","Edema agudo do pulmão","Dificuldade respiratória ligeira","Crise de asma ligeira"],"correct":1},
     {"chapter":6,"text":"Em que situações o Nadador-Salvador (NS) deverá administrar 5 litros de oxigénio a um adulto?","options":["Hemorragias graves","Crise de asma ligeira","Paragens respiratória","Edema agudo do pulmão"],"correct":1},
-    {"chapter":6,"text":"Quais os cuidados a ter com o equipamento de oxigénio (O2)?","options":["Não expor a garrafa a temperaturas superiores a 30ºC","Manter o equipamento sempre limpo e lubrificado","Após a sua utilização fechar a garrafa e descarregar o sistema","Não fumar ou fazer lume ao administrar oxigénio, realizar a prova hidráulica de 10 em 10 anos"],"correct":2},
+    {"chapter":6,"text":"Quais os cuidados a ter com o equipamento de oxigénio (O₂)?","options":["Não expor a garrafa a temperaturas superiores a 30ºC","Manter o equipamento sempre limpo e lubrificado","Após a sua utilização fechar a garrafa e descarregar o sistema","Não fumar ou fazer lume ao administrar oxigénio, realizar a prova hidráulica de 10 em 10 anos"],"correct":2},
     {"chapter":6,"text":"Quais os riscos para o Nadador-Salvador (NS) associados à prestação de 1ºs socorros?","options":["Ficar exausto e não conseguir executar as manobras de Suporte Básico de Vida (SBV)","Não usar luvas, máscara e não desinfetar as vias aéreas da vítima com álcool a 70º","Expor-se a um risco igual ou superior ao que a vítima está exposta","O NS deve correr riscos para salvar a vida da vítima, pois é esse o seu dever."],"correct":2},
     {"chapter":6,"text":"A respiração artificial com ar expirado pode ser feita de que modos:","options":["Com o insuflador manual","Boca-a-boca, boca-nariz-boca e Boca-estoma","Boca-nariz, boca-máscara e máscara composta","Todas as respostas anteriores estão corretas"],"correct":1},
     {"chapter":6,"text":"A respiração artificial com a ventilação mecânica é feita com o seguinte aparelho:","options":["Insuflador manual","Máscara facial composta","Máscara facial simples","Todas as respostas anteriores estão corretas"],"correct":0},
     {"chapter":6,"text":"Caracterize os procedimentos do exame Primário?","options":["Permeabilidade da via aérea, Exposição com prevenção de Hipotermia, função ventilatória, função respiratória e função circulatória","Permeabilidade da via aérea, função respiratória, função cardiocirculatória, disfunção neurológica, exposição com prevenção da Hipotermia","Função ventilatória, função respiratória, função circulatória e permeabilidade da via aérea","Função ventilatória, função circulatória, função neurológica, prevenção da hipotermia, estímulos verbais e de reação"],"correct":1},
     {"chapter":6,"text":"A Posição lateral de segurança (PLS) é efetuada, quando?","options":["Quando a vitima não respira","A vitima está inconsciente, mas ventila e há suspeita de trauma","Quando a vitima está inconsciente, mas ventila e não há suspeitas de trauma, certificar-se que tem a via aérea permeabilizada","Quando a vitima está inconsciente, mas ventila normalmente e não há suspeitas de trauma e a via aérea não está permeabilizada"],"correct":2},
-    {"chapter":6,"text":"Identifique como proceder para auferir a autonomia da garrafa de oxigénio (O2):","options":["Saber a sua pressão e dividir pela sua capacidade","Saber a capacidade da garrafa e a sua pressão","Saber os minutos e pela sua capacidade","Multiplicar pela sua capacidade e dividir pela sua pressão"],"correct":1},
-    {"chapter":6,"text":"Indique qual o método e os débitos indicados, quando se utiliza a máscara composta para administrar oxigénio (O2)?","options":["Insuflação com 10l/15l minuto","Inalação com 10l/15l minuto","Insuflação com 5l minuto","Inalação com 5l minuto"],"correct":1},
-    {"chapter":6,"text":"O Nadador-Salvador (NS) tem 100 bar na garrafa de Oxigénio (O2) de 2 litros, está a debitar 10 litros, durante quanto tempo consegue o NS fornecer O2?","options":["10 minutos","15 minutos","20 minutos","25 minutos"],"correct":2},
-    {"chapter":6,"text":"Perante uma criança com uma crise de asma grave, o Nadador-Salvador (NS) administra oxigénio (O2) e liga 112. A garrafa de 2 litros está carregada a 180 bar, durante quanto tempo o NS consegue garantir a administração de oxigénio (O2) a vítima?","options":["25 minutos","36 minutos","24 minutos","72 minutos"],"correct":1},
-    {"chapter":6,"text":"Perante um adulto com uma crise de asma grave, o Nadador-Salvador (NS) administra oxigénio (O2) e telefona ao 112. A garrafa de 2 litros está carregada a 150 bar, durante quanto tempo o NS consegue garantir a administração de oxigénio (O2) a vítima?","options":["30 minutos","25 minutos","60 minutos","20 minutos"],"correct":3},
+    {"chapter":6,"text":"Identifique como proceder para auferir a autonomia da garrafa de oxigénio (O₂):","options":["Saber a sua pressão e dividir pela sua capacidade","Saber a capacidade da garrafa e a sua pressão","Saber os minutos e pela sua capacidade","Multiplicar pela sua capacidade e dividir pela sua pressão"],"correct":1},
+    {"chapter":6,"text":"Indique qual o método e os débitos indicados, quando se utiliza a máscara composta para administrar oxigénio (O₂)?","options":["Insuflação com 10l/15l minuto","Inalação com 10l/15l minuto","Insuflação com 5l minuto","Inalação com 5l minuto"],"correct":1},
+    {"chapter":6,"text":"O Nadador-Salvador (NS) tem 100 bar na garrafa de Oxigénio (O₂) de 2 litros, está a debitar 10 litros, durante quanto tempo consegue o NS fornecer O₂?","options":["10 minutos","15 minutos","20 minutos","25 minutos"],"correct":2},
+    {"chapter":6,"text":"Perante uma criança com uma crise de asma grave, o Nadador-Salvador (NS) administra oxigénio (O₂) e liga 112. A garrafa de 2 litros está carregada a 180 bar, durante quanto tempo o NS consegue garantir a administração de oxigénio (O₂) a vítima?","options":["25 minutos","36 minutos","24 minutos","72 minutos"],"correct":1},
+    {"chapter":6,"text":"Perante um adulto com uma crise de asma grave, o Nadador-Salvador (NS) administra oxigénio (O₂) e telefona ao 112. A garrafa de 2 litros está carregada a 150 bar, durante quanto tempo o NS consegue garantir a administração de oxigénio (O₂) a vítima?","options":["30 minutos","25 minutos","60 minutos","20 minutos"],"correct":3},
     {"chapter":6,"text":"Para fazer face a uma paragem cardiorrespiratória, o Nadador-Salvador (NS), utiliza o Suporte Básico de Vida (SBV) com o objetivo de garantir:","options":["A avaliação inicial, Ver, Ouvir e Sentir (VOS) e a permeabilização da via aérea","A ventilação e circulação","A permeabilização da via aérea e a ventilação","As Compressões Torácicas Externas (CTE) e as insuflações"],"correct":1},
     {"chapter":6,"text":"Se a vítima respira e está inconsciente, deve-se:","options":["Iniciar as manobras de Suporte Básico de Vida (SBV)","Colocar açúcar debaixo da língua","Elevar as pernas a 45º","Colocar na Posição Lateral de Segurança (PLS)"],"correct":3},
     {"chapter":6,"text":"A compressão cardíaca externa faz-se no:","options":["No terço superior externo","No terço inferior externo","Na linha do umbigo","No centro do tórax"],"correct":3},
@@ -416,7 +442,7 @@
     {"chapter":7,"text":"\"Diminuição do volume de sangue dentro dos vasos\". Que tipo de choque pode ocorrer?","options":["Choque Neurogénico","Choque Hipovolémico","Choque Cardiogénico","Todas as respostas anteriores estão corretas"],"correct":1},
     {"chapter":7,"text":"Identifique as técnicas de remoção de vitimas de Traumatismo Vertebromedular (TVM).","options":["Levantamento e Rolamento","Arrancamento, Rolamento","Deslocamento, Levantamento","Levantamento, Arrancamento"],"correct":0},
     {"chapter":7,"text":"Identifique as fases que se podem suceder continuamente no Grande Mal Epilético:","options":["Tónica e Pós-Critica","Aura e Clónica","Clónica e Aura","Tónica e Clónica"],"correct":3},
-    {"chapter":7,"text":"No exame geral da vítima, num Traumatismo Vertebromedular (TVM), a avaliação neurológica permite-nos determinar entre outros:","options":["O debito de O2 que necessita","A função respiratória e circulatória","Se responde a estímulos verbais e/ou dolorosos","O estado de hipotermia da vítima"],"correct":2},
+    {"chapter":7,"text":"No exame geral da vítima, num Traumatismo Vertebromedular (TVM), a avaliação neurológica permite-nos determinar entre outros:","options":["O debito de O₂ que necessita","A função respiratória e circulatória","Se responde a estímulos verbais e/ou dolorosos","O estado de hipotermia da vítima"],"correct":2},
     {"chapter":7,"text":"No Grande Mal Epilético, qual é a fase em que a vítima perde a consciência:","options":["Fase aura","Fase tónica","Fase clónica","Pós-crítica"],"correct":1},
     {"chapter":7,"text":"No Grande Mal Epilético, qual é a fase em que a vítima tem movimentos de contração-relaxamento de grupos de músculos:","options":["Fase aura","Fase tónica","Fase clónica","Pós-crítica"],"correct":2},
     {"chapter":7,"text":"No Grande Mal Epilético, qual é a fase em que a vítima tem ou refere ter tido uma alucinação sensorial com sensação de ataque eminente:","options":["Fase aura","Fase tónica","Fase clónica","Pós-crítica"],"correct":0},
@@ -451,6 +477,94 @@
     if (!exams.length) return 0;
     return Math.round(exams.reduce((a,h)=>a+h.pct,0) / exams.length);
   };
+  const qKey = q => q.text + "|" + [...q.options].sort().join("|");
+
+  // ── Teste para turma: índices por capítulo + exportação PDF ──
+  const QIDX = CHAPTERS.map((_,ci) => QUESTIONS.map((_,i)=>i).filter(i => QUESTIONS[i].chapter===ci));
+  const PDF_LETTERS = ["A","B","C","D"];
+  const PW = 210, PH = 297, PM = 18, PCW = PW - 2*PM;
+
+  const pdfClean = t => String(t)
+    .replace(/[\u2013\u2014]/g,"-").replace(/[\u2018\u2019]/g,"'").replace(/[\u201C\u201D]/g,'"')
+    .replace(/\u2026/g,"...").replace(/\u20AC/g,"EUR").replace(/\u2082/g,"2").replace(/\u00A0/g," ")
+    .replace(/[^\u0000-\u00FF]/g,"?");
+  const pdfSlug = t => pdfClean(t).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase()
+    .replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"") || "teste";
+
+  const pdfWrap = (doc, text, w, size, bold) => {
+    doc.setFont("helvetica", bold ? "bold" : "normal"); doc.setFontSize(size);
+    return doc.splitTextToSize(pdfClean(text), w);
+  };
+  const PDF_GREEN = [21, 110, 52], PDF_GREEN_BG = [226, 244, 232];
+  const pdfColor = (doc, c) => Array.isArray(c) ? doc.setTextColor(c[0], c[1], c[2]) : doc.setTextColor(c);
+  const pdfDraw = (doc, st, lines, x, lh, size, bold, color) => {
+    doc.setFont("helvetica", bold ? "bold" : "normal"); doc.setFontSize(size); pdfColor(doc, color);
+    lines.forEach((ln,i) => doc.text(ln, x, st.y + lh*i + lh*0.78));
+    st.y += lines.length * lh;
+  };
+  const pdfEnsure = (doc, st, h) => { if (st.y + h > PH - PM - 4) { doc.addPage(); st.y = PM; } };
+  const pdfRule = (doc, st) => { doc.setDrawColor(190); doc.setLineWidth(0.3); doc.line(PM, st.y, PW-PM, st.y); st.y += 7; };
+
+  // Desenha uma pergunta; com showAnswer=true destaca a opção certa (negrito + verde)
+  const pdfQuestion = (doc, st, q, n, showAnswer) => {
+    const ql = pdfWrap(doc, (n+1) + ". " + q.text, PCW, 11, true);
+    const ols = q.options.map((o,k) => pdfWrap(doc, o, PCW-10, 10.5, showAnswer && k === q.correct));
+    const h = ql.length*5.2 + 1.5 + ols.reduce((a,l) => a + l.length*4.7 + 1.3, 0) + 5;
+    pdfEnsure(doc, st, h);
+    pdfDraw(doc, st, ql, PM, 5.2, 11, true, 0);
+    st.y += 1.5;
+    ols.forEach((ol,k) => {
+      const right = showAnswer && k === q.correct;
+      const col = right ? PDF_GREEN : 0;
+      if (right) {
+        doc.setFillColor(PDF_GREEN_BG[0], PDF_GREEN_BG[1], PDF_GREEN_BG[2]);
+        doc.rect(PM+1, st.y - 0.6, PCW-1, ol.length*4.7 + 1.0, "F");
+      }
+      doc.setFont("helvetica","bold"); doc.setFontSize(10.5); pdfColor(doc, col);
+      doc.text(PDF_LETTERS[k] + ")", PM+3, st.y + 4.7*0.78);
+      pdfDraw(doc, st, ol, PM+10, 4.7, 10.5, right, col);
+      st.y += 1.3;
+    });
+    st.y += 5;
+  };
+
+  const buildTestDoc = (doc, title, qs, withHeader) => {
+    const st = { y: PM };
+    pdfDraw(doc, st, pdfWrap(doc, title, PCW, 16, true), PM, 7.2, 16, true, 0);
+    st.y += 1;
+    pdfDraw(doc, st, [qs.length + " perguntas"], PM, 5, 9.5, false, 110);
+    st.y += 4;
+    if (withHeader) {
+      doc.setFont("helvetica","normal"); doc.setFontSize(10.5); doc.setTextColor(0);
+      doc.text("Nome:", PM, st.y + 4); doc.setDrawColor(120); doc.setLineWidth(0.2); doc.line(PM+13, st.y+4, PM+112, st.y+4);
+      doc.text("Data:", PM+120, st.y + 4); doc.line(PM+132, st.y+4, PW-PM, st.y+4);
+      st.y += 12;
+    }
+    pdfRule(doc, st);
+    qs.forEach((q,n) => pdfQuestion(doc, st, q, n, false));
+  };
+
+  const buildKeyDoc = (doc, title, qs) => {
+    const st = { y: PM };
+    pdfDraw(doc, st, pdfWrap(doc, title, PCW, 16, true), PM, 7.2, 16, true, 0);
+    st.y += 1;
+    pdfDraw(doc, st, [qs.length + " perguntas  |  resposta certa a verde e negrito"], PM, 5, 9.5, false, 110);
+    st.y += 4;
+    pdfRule(doc, st);
+    qs.forEach((q,n) => pdfQuestion(doc, st, q, n, true));
+  };
+
+  const makePdf = (build, filename) => {
+    if (!window.jspdf) { alert("Não foi possível carregar a biblioteca de PDF. Verifica a ligação à internet e recarrega a página."); return; }
+    const doc = new window.jspdf.jsPDF({ unit:"mm", format:"a4" });
+    build(doc);
+    const pc = doc.getNumberOfPages();
+    for (let p = 1; p <= pc; p++) {
+      doc.setPage(p); doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(140);
+      doc.text(p + " / " + pc, PW/2, PH-9, { align:"center" });
+    }
+    doc.save(filename);
+  };
   const shuffleOptions = q => {
     const idx = shuffle([0,1,2,3]);
     return { ...q, options: idx.map(i => q.options[i]), correct: idx.indexOf(q.correct) };
@@ -467,14 +581,18 @@
     const [current, setCurrent] = useState(0);
     const [selected, setSelected] = useState(null);
     const [confirmed, setConfirmed] = useState(false);
-    const [answers, setAnswers] = useState([]);
+    const [picks, setPicks] = useState(() => questions.map(() => null));
+    const [locked, setLocked] = useState(() => questions.map(() => false));
     const [seconds, setSeconds] = useState(isExam ? 20*60 : 0);
-    const answersRef = useRef(answers);
-    answersRef.current = answers;
+    const picksRef = useRef(picks);
+    picksRef.current = picks;
+    const buildAnswers = p => shuffled
+      .map((qq,i) => ({ question: qq, chosen: p[i] }))
+      .filter(a => a.chosen !== null);
 
     useEffect(() => {
       if (!isExam) return;
-      if (seconds <= 0) { onFinish(answersRef.current); return; }
+      if (seconds <= 0) { onFinish(buildAnswers(picksRef.current)); return; }
       const t = setInterval(() => setSeconds(s => s-1), 1000);
       return () => clearInterval(t);
     }, [isExam, seconds]);
@@ -483,19 +601,26 @@
     const total = shuffled.length;
     const letters = ["A","B","C","D"];
 
+    const goTo = (i, p = picks, l = locked) => {
+      setCurrent(i); setSelected(p[i]); setConfirmed(l[i]);
+    };
     const confirm = () => {
       if (selected === null) return;
+      const newPicks = picks.map((v,i) => i===current ? selected : v);
+      setPicks(newPicks);
       if (isExam) {
-        const newAns = [...answers, { question: q, chosen: selected }];
-        if (current+1 >= total) { onFinish(newAns); return; }
-        setAnswers(newAns); setCurrent(c => c+1); setSelected(null); setConfirmed(false);
-      } else { setConfirmed(true); }
+        if (current+1 >= total) { onFinish(buildAnswers(newPicks)); return; }
+        goTo(current+1, newPicks, locked);
+      } else {
+        setLocked(l => l.map((v,i) => i===current ? true : v));
+        setConfirmed(true);
+      }
     };
     const next = () => {
-      const newAns = [...answers, { question: q, chosen: selected }];
-      if (current+1 >= total) { onFinish(newAns); return; }
-      setAnswers(newAns); setCurrent(c => c+1); setSelected(null); setConfirmed(false);
+      if (current+1 >= total) { onFinish(buildAnswers(picks)); return; }
+      goTo(current+1);
     };
+    const prev = () => { if (current > 0) goTo(current-1); };
 
     return (
       <div>
@@ -531,6 +656,7 @@
         )}
         <div className="quiz-actions">
           <button className="btn btn-secondary" onClick={onBack}>Sair</button>
+          {current > 0 && <button className="btn btn-secondary" onClick={prev}>← Anterior</button>}
           {!confirmed
             ? <button className="btn btn-primary" onClick={confirm} disabled={selected===null}>Confirmar</button>
             : !isExam && <button className="btn btn-primary" onClick={next}>{current+1>=total?"Ver Resultados":"Próxima →"}</button>
@@ -540,7 +666,7 @@
     );
   }
 
-  function ResultsView({ answers, isExam, newScore, onRetry, onHome }) {
+  function ResultsView({ answers, isExam, newScore, wrongMode, wrongCount, onRetry, onRetryWrong, onHome }) {
     const correct = answers.filter(a => a.chosen===a.question.correct).length;
     const total = answers.length;
     const pct = Math.round(correct/total*100);
@@ -549,7 +675,7 @@
     return (
       <div>
         <div className="results-hero">
-          <div className="results-label">{isExam?"Simulação de Exame":"Treino por Capítulo"}</div>
+          <div className="results-label">{isExam?"Simulação de Exame":wrongMode?"Repetição das Erradas":"Treino por Capítulo"}</div>
           <div className="results-score">{pct}%</div>
           <div className="results-verdict" style={{color:passed?"var(--success)":"var(--error)"}}>
             {passed?"🎉 Aprovado!":"📚 Continua a estudar"}
@@ -578,7 +704,12 @@
             </div>
           );
         })}
-        <div className="quiz-actions" style={{marginTop:20}}>
+        {wrongCount > 0 && (
+          <button className="btn btn-primary" style={{width:"100%",marginTop:20}} onClick={onRetryWrong}>
+            ❌ Repetir só as erradas ({wrongCount})
+          </button>
+        )}
+        <div className="quiz-actions" style={{marginTop: wrongCount > 0 ? 10 : 20}}>
           <button className="btn btn-secondary" onClick={onHome}>Início</button>
           <button className="btn btn-primary" onClick={onRetry}>🔄 Repetir</button>
         </div>
@@ -693,6 +824,204 @@
     );
   }
 
+  const MAX_TEST_Q = 20;
+
+  function ClassTestView({ onBack }) {
+    const [step, setStep] = useState("chapters");
+    const [chosen, setChosen] = useState([]);
+    const [sel, setSel] = useState(() => new Set());
+    const [title, setTitle] = useState("Teste de Nadador-Salvador");
+    const [keyTitle, setKeyTitle] = useState("");
+    const [withHeader, setWithHeader] = useState(true);
+    const [rank, setRank] = useState(null);
+    const [openQ, setOpenQ] = useState(() => new Set());
+    const [flash, setFlash] = useState(null);
+    useEffect(() => {
+      if (!flash) return;
+      const t = setTimeout(() => setFlash(null), 2400);
+      return () => clearTimeout(t);
+    }, [flash]);
+
+    const available = chosen.reduce((a,ci) => a + QIDX[ci].length, 0);
+    const full = sel.size >= MAX_TEST_Q;
+
+    const toggleChapter = ci => setChosen(c => c.includes(ci) ? c.filter(x => x!==ci) : [...c, ci].sort((a,b) => a-b));
+    const goQuestions = () => {
+      setSel(s => new Set([...s].filter(i => chosen.includes(QUESTIONS[i].chapter))));
+      setStep("questions");
+    };
+    const toggleQ = i => setSel(s => {
+      const n = new Set(s);
+      if (n.has(i)) n.delete(i); else if (n.size < MAX_TEST_Q) n.add(i);
+      return n;
+    });
+    const fillRandom = () => setSel(s => {
+      const n = new Set(s);
+      const pool = chosen.flatMap(ci => QIDX[ci]).filter(i => !n.has(i));
+      for (let k = pool.length-1; k > 0; k--) { const j = Math.floor(Math.random()*(k+1)); [pool[k], pool[j]] = [pool[j], pool[k]]; }
+      pool.slice(0, MAX_TEST_Q - n.size).forEach(i => n.add(i));
+      return n;
+    });
+
+    const orderIdx = () => {
+      const idx = [...sel].sort((a,b) => a-b);
+      if (rank) idx.sort((a,b) => rank[a]-rank[b]);
+      return idx;
+    };
+    const ordered = () => orderIdx().map(i => QUESTIONS[i]);
+    const posMap = new Map(orderIdx().map((i,k) => [i, k+1]));
+    const resetAll = () => {
+      setSel(new Set()); setRank(null); setOpenQ(new Set());
+      setFlash({ key: Date.now(), kind: "reset" });
+    };
+    const shuffleOrder = () => { setRank(QUESTIONS.map(() => Math.random())); setFlash({ key: Date.now(), kind: "shuffled" }); };
+    const resetOrder = () => { setRank(null); setFlash({ key: Date.now(), kind: "original" }); };
+    const finalTitle = () => title.trim() || "Teste de Nadador-Salvador";
+    const finalKeyTitle = () => keyTitle.trim() || "Soluções – " + finalTitle();
+    const toggleOpenQ = i => setOpenQ(o => { const n = new Set(o); if (n.has(i)) n.delete(i); else n.add(i); return n; });
+    const allVisible = chosen.flatMap(ci => QIDX[ci]);
+    const allOpen = allVisible.length > 0 && allVisible.every(i => openQ.has(i));
+    const exportTest = () => {
+      const qs = ordered(), t = finalTitle();
+      makePdf(doc => buildTestDoc(doc, t, qs, withHeader), pdfSlug(t) + ".pdf");
+    };
+    const exportKey = () => {
+      const qs = ordered(), kt = finalKeyTitle();
+      let f = pdfSlug(kt); if (f === pdfSlug(finalTitle())) f += "-solucoes";
+      makePdf(doc => buildKeyDoc(doc, kt, qs), f + ".pdf");
+    };
+    const chName = ci => CHAPTERS[ci].split("–")[1]?.trim() || CHAPTERS[ci];
+
+    // ── Janela 1: escolher capítulos ──
+    if (step === "chapters") {
+      return (
+        <div>
+          <div className="section-title">📋 Criador de Teste</div>
+          <div className="section-sub">1. Escolhe os capítulos de onde queres tirar perguntas</div>
+          <div className="select-actions">
+            <div className="select-hint">
+              {chosen.length===0 ? "Nenhum capítulo selecionado"
+                : <>{chosen.length} capítulo{chosen.length>1?"s":""} · <span>{available} perguntas disponíveis</span></>}
+            </div>
+            <div style={{display:"flex",gap:8}}>
+              <button className="btn btn-secondary btn-sm" onClick={() => setChosen(CHAPTERS.map((_,i) => i))}>Todos</button>
+              <button className="btn btn-secondary btn-sm" onClick={() => setChosen([])}>Limpar</button>
+            </div>
+          </div>
+          <div className="chapter-select-grid">
+            {CHAPTERS.map((c,ci) => {
+              const on = chosen.includes(ci);
+              return (
+                <div key={ci} className={"chapter-select-item"+(on?" selected":"")} onClick={() => toggleChapter(ci)}>
+                  <div className="chapter-select-check">{on?"✓":""}</div>
+                  <div>
+                    <div className="chapter-select-name">{chName(ci)}</div>
+                    <div className="chapter-select-count">{QIDX[ci].length} perguntas</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          {chosen.length>0 && available<MAX_TEST_Q && <div className="warning-box">⚠️ Precisas de pelo menos {MAX_TEST_Q} perguntas disponíveis. Faltam {MAX_TEST_Q-available}.</div>}
+          <div className="quiz-actions">
+            <button className="btn btn-secondary" onClick={onBack}>← Voltar</button>
+            <button className="btn btn-primary" disabled={chosen.length===0 || available<MAX_TEST_Q} onClick={goQuestions}>Continuar →</button>
+          </div>
+        </div>
+      );
+    }
+
+    // ── Janela 2: escolher perguntas (máx. 20) ──
+    return (
+      <div>
+        <div style={{marginBottom:14}}><button className="btn btn-secondary btn-sm" onClick={() => setStep("chapters")}>← Capítulos</button></div>
+        <div className="section-title">📋 Criador de Teste</div>
+
+        <label className="ct-field-label" htmlFor="ct-title">Título do teste (cabeçalho do PDF do teste)</label>
+        <input id="ct-title" className="ct-input" type="text" value={title} maxLength={80} onChange={e => setTitle(e.target.value)} placeholder="Teste de Nadador-Salvador" />
+        <label className="ct-field-label" htmlFor="ct-keytitle">Título das soluções (cabeçalho do PDF das soluções)</label>
+        <input id="ct-keytitle" className="ct-input" type="text" value={keyTitle} maxLength={80} onChange={e => setKeyTitle(e.target.value)} placeholder={"Soluções – " + finalTitle()} />
+
+        <div className="ct-opts">
+          <label className="ct-label"><input type="checkbox" className="ct-check" checked={withHeader} onChange={e => setWithHeader(e.target.checked)} /> Linha de Nome do aluno e Data (no teste)</label>
+        </div>
+        <div className="ct-opts">
+          <div className="select-hint">{rank ? <span>Ordem baralhada (igual no teste e nas soluções)</span> : "Ordem original por capítulo"}</div>
+          <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+            <button className={"btn btn-secondary btn-sm" + (rank ? " shuffled" : "")} onClick={shuffleOrder}>{rank ? "🔀 Baralhada ✓ (baralhar de novo)" : "🔀 Baralhar ordem"}</button>
+            {rank && <button className="btn btn-secondary btn-sm" onClick={resetOrder}>↩ Ordem original</button>}
+          </div>
+        </div>
+        <div className="ct-opts">
+          <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+            <button className="btn btn-secondary btn-sm" disabled={full} onClick={fillRandom}>🎲 Preencher ao acaso{!full ? " (faltam " + (MAX_TEST_Q - sel.size) + ")" : ""}</button>
+            <button className="btn btn-secondary btn-sm" onClick={resetAll}>Limpar</button>
+            <button className="btn btn-secondary btn-sm" onClick={() => setOpenQ(allOpen ? new Set() : new Set(allVisible))}>{allOpen ? "Recolher opções" : "Expandir opções"}</button>
+          </div>
+        </div>
+        {flash && (
+          <div className="ct-flash" key={flash.key} role="status">
+            {flash.kind === "shuffled"
+              ? (sel.size ? "🔀 Ordem baralhada! Os números laranja mostram a nova posição de cada pergunta." : "🔀 Ordem baralhada! Aplica-se às perguntas que escolheres.")
+              : flash.kind === "reset"
+                ? "🧹 Perguntas, ordem baralhada e opções expandidas repostas."
+                : "↩ Voltou à ordem original por capítulo."}
+          </div>
+        )}
+        {full && <div className="warning-box">{MAX_TEST_Q}/{MAX_TEST_Q} perguntas escolhidas. Desmarca uma para trocar por outra.</div>}
+
+        {chosen.map(ci => {
+          const ids = QIDX[ci];
+          const n = ids.filter(i => sel.has(i)).length;
+          return (
+            <div className="ct-chapter" key={ci}>
+              <div className="ct-chapter-head">
+                <div className="ct-chapter-info">
+                  <div className="chapter-select-name">{ci+1}. {chName(ci)}</div>
+                  <div className="chapter-select-count">{n} selecionada{n!==1?"s":""} · {ids.length} disponíveis</div>
+                </div>
+              </div>
+              {ids.map(i => {
+                const q = QUESTIONS[i];
+                const blocked = !sel.has(i) && full;
+                return (
+                  <label className="ct-q" key={i} style={blocked ? {opacity:0.45,cursor:"not-allowed"} : undefined}>
+                    <input type="checkbox" className="ct-check" checked={sel.has(i)} disabled={blocked} onChange={() => toggleQ(i)} />
+                    <div style={{flex:1,minWidth:0}}>
+                      <div className="ct-q-text">{q.text}</div>
+                      {openQ.has(i) ? (
+                        <div className="ct-q-opts">
+                          {q.options.map((o,k) => (
+                            <div key={k} className={"ct-q-opt" + (k===q.correct ? " right" : "")}><b>{PDF_LETTERS[k]})</b> {o}</div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="ct-q-ans">✓ {q.options[q.correct]}</div>
+                      )}
+                      <button type="button" className="ct-q-more" aria-expanded={openQ.has(i)}
+                        onClick={e => { e.preventDefault(); e.stopPropagation(); toggleOpenQ(i); }}>
+                        {openQ.has(i) ? "Esconder opções ▴" : "Ver todas as opções ▾"}
+                      </button>
+                    </div>
+                    {sel.has(i) && <span className="ct-pos" title="Posição no teste">Nº {posMap.get(i)}</span>}
+                  </label>
+                );
+              })}
+            </div>
+          );
+        })}
+
+        <div className="ct-bar">
+          <div className="ct-count"><span>{sel.size}/{MAX_TEST_Q}</span> perguntas selecionadas</div>
+          <div className="ct-bar-btns">
+            <button className="btn btn-primary" disabled={!full} onClick={exportTest}>📄 Teste (PDF)</button>
+            <button className="btn btn-secondary" disabled={!full} onClick={exportKey}>🔑 Soluções (PDF)</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   function CustomExamView({ counts, onStart, onBack }) {
     const [selected, setSelected] = useState([]);
     const toggle = ci => setSelected(s => s.includes(ci) ? s.filter(x=>x!==ci) : [...s,ci]);
@@ -746,6 +1075,7 @@
     const [selChapter, setSelChapter] = useState(null);
     const [selCustomChapters, setSelCustomChapters] = useState([]);
     const [stats, setStats] = useState(loadStats);
+    const [wrongMode, setWrongMode] = useState(false);
 
     const counts = CHAPTERS.map((_,ci) => QUESTIONS.filter(q=>q.chapter===ci).length);
     const score = calcScore(stats.history);
@@ -753,17 +1083,31 @@
 
     const startExam = () => {
       setSelCustomChapters([]);
+      setWrongMode(false);
       setIsExam(true); setQuizQs(shuffle(QUESTIONS).slice(0,20)); setView("quiz");
     };
     const startCustomExam = sel => {
       const pool = QUESTIONS.filter(q=>sel.includes(q.chapter));
       setSelCustomChapters(sel);
+      setWrongMode(false);
       setIsExam(true); setQuizQs(shuffle(pool).slice(0,20)); setView("quiz");
     };
     const startChapter = ci => {
       const qs = QUESTIONS.filter(q=>q.chapter===ci);
       if (!qs.length) return;
+      setWrongMode(false);
       setIsExam(false); setSelChapter(ci); setQuizQs(shuffle(qs)); setView("quiz");
+    };
+
+    // Perguntas erradas (ou não respondidas) da última tentativa
+    const wrongQs = (() => {
+      const answered = new Set(answers.map(a => qKey(a.question)));
+      const wrong = new Set(answers.filter(a => a.chosen !== a.question.correct).map(a => qKey(a.question)));
+      return quizQs.filter(q => !answered.has(qKey(q)) || wrong.has(qKey(q)));
+    })();
+    const startWrong = () => {
+      if (!wrongQs.length) return;
+      setWrongMode(true); setIsExam(false); setQuizQs(shuffle(wrongQs)); setView("quiz");
     };
 
     const handleFinish = ans => {
@@ -802,6 +1146,7 @@
               <div className="home-sub">Prepara-te para o exame com simulações e estudo por capítulo</div>
               <div className="tab-bar">
                 <button className="tab-btn active">📚 Teórico</button>
+                <button className="tab-btn" onClick={() => setView("classTest")}>📋 Criador de teste</button>
                 <button className="tab-btn" onClick={() => setView("sbv")}>🚑 SBV</button>
               </div>
 
@@ -873,10 +1218,12 @@
               <div style={{marginTop:18}}><button className="btn btn-secondary" onClick={() => setView("home")}>← Voltar</button></div>
             </div>
           )}
+          {view==="classTest" && <ClassTestView onBack={() => setView("home")} />}
           {view==="customExam" && <CustomExamView counts={counts} onStart={startCustomExam} onBack={() => setView("home")} />}
-          {view==="quiz" && <QuizView questions={quizQs} isExam={isExam} onFinish={handleFinish} onBack={() => setView(isExam?"home":"chapters")} />}
-          {view==="results" && <ResultsView answers={answers} isExam={isExam} newScore={newScore} onRetry={() => {
-            if (!isExam) startChapter(selChapter);
+          {view==="quiz" && <QuizView questions={quizQs} isExam={isExam} onFinish={handleFinish} onBack={() => setView(isExam||wrongMode?"home":"chapters")} />}
+          {view==="results" && <ResultsView answers={answers} isExam={isExam} newScore={newScore} wrongMode={wrongMode} wrongCount={wrongQs.length} onRetryWrong={startWrong} onRetry={() => {
+            if (wrongMode) { setQuizQs(shuffle(quizQs)); setView("quiz"); }
+            else if (!isExam) startChapter(selChapter);
             else if (selCustomChapters.length > 0) startCustomExam(selCustomChapters);
             else startExam();
           }} onHome={() => setView("home")} />}
@@ -889,6 +1236,7 @@
 
   // ── SBV GERADOR ───────────────────────────────────────────────
   const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+  const TIPO_LOCAL = { "marítima": "Praia marítima", fluvial: "Praia fluvial", piscina: "Piscina" };
 
   const LOCAIS = [
     { nome:"Praia de Caxias",                tipo:"marítima", municipio:"Oeiras"          },
@@ -934,6 +1282,42 @@
     { nome:"Piscina Olímpica do Porto",      tipo:"piscina",  municipio:"Porto"           },
     { nome:"Piscinas de Braga",              tipo:"piscina",  municipio:"Braga"           },
     { nome:"Piscinas Municipais de Coimbra", tipo:"piscina",  municipio:"Coimbra"         },
+    { nome:"Praia de Carcavelos", tipo:"marítima", municipio:"Cascais" },
+    { nome:"Praia da Costa da Caparica", tipo:"marítima", municipio:"Almada" },
+    { nome:"Praia da Adraga", tipo:"marítima", municipio:"Sintra" },
+    { nome:"Praia da Foz do Arelho", tipo:"marítima", municipio:"Caldas da Rainha" },
+    { nome:"Praia de São Martinho do Porto", tipo:"marítima", municipio:"Alcobaça" },
+    { nome:"Praia da Barra", tipo:"marítima", municipio:"Ílhavo" },
+    { nome:"Praia da Costa Nova", tipo:"marítima", municipio:"Ílhavo" },
+    { nome:"Praia da Vagueira", tipo:"marítima", municipio:"Vagos" },
+    { nome:"Praia do Furadouro", tipo:"marítima", municipio:"Ovar" },
+    { nome:"Praia da Aguda", tipo:"marítima", municipio:"Vila Nova de Gaia" },
+    { nome:"Praia de Santa Cruz", tipo:"marítima", municipio:"Torres Vedras" },
+    { nome:"Praia do Meco", tipo:"marítima", municipio:"Sesimbra" },
+    { nome:"Praia da Figueirinha", tipo:"marítima", municipio:"Setúbal" },
+    { nome:"Praia de Carvoeiro", tipo:"marítima", municipio:"Lagoa" },
+    { nome:"Praia da Marinha", tipo:"marítima", municipio:"Lagoa" },
+    { nome:"Praia de Armação de Pêra", tipo:"marítima", municipio:"Silves" },
+    { nome:"Praia da Luz", tipo:"marítima", municipio:"Lagos" },
+    { nome:"Praia de Monte Gordo", tipo:"marítima", municipio:"Vila Real de St. António" },
+    { nome:"Praia de Vila Nova de Milfontes", tipo:"marítima", municipio:"Odemira" },
+    { nome:"Praia da Zambujeira do Mar", tipo:"marítima", municipio:"Odemira" },
+    { nome:"Praia de Santo André", tipo:"marítima", municipio:"Santiago do Cacém" },
+    { nome:"Praia de Porto Santo", tipo:"marítima", municipio:"Porto Santo" },
+    { nome:"Praia de Santa Bárbara", tipo:"marítima", municipio:"Ribeira Grande" },
+    { nome:"Praia Fluvial de Loriga", tipo:"fluvial", municipio:"Seia" },
+    { nome:"Praia Fluvial do Penedo Furado", tipo:"fluvial", municipio:"Vila de Rei" },
+    { nome:"Praia Fluvial de Alvoco das Várzeas", tipo:"fluvial", municipio:"Oliveira do Hospital" },
+    { nome:"Praia Fluvial de Cerva", tipo:"fluvial", municipio:"Ribeira de Pena" },
+    { nome:"Praia Fluvial das Fragas de São Simão", tipo:"fluvial", municipio:"Figueiró dos Vinhos" },
+    { nome:"Praia Fluvial de Dornes", tipo:"fluvial", municipio:"Ferreira do Zêzere" },
+    { nome:"Praia Fluvial de Janeiro de Cima", tipo:"fluvial", municipio:"Fundão" },
+    { nome:"Piscinas Municipais de Guimarães", tipo:"piscina", municipio:"Guimarães" },
+    { nome:"Piscinas Municipais de Viana do Castelo", tipo:"piscina", municipio:"Viana do Castelo" },
+    { nome:"Piscinas Municipais de Aveiro", tipo:"piscina", municipio:"Aveiro" },
+    { nome:"Piscinas Municipais de Leiria", tipo:"piscina", municipio:"Leiria" },
+    { nome:"Piscinas Municipais de Faro", tipo:"piscina", municipio:"Faro" },
+    { nome:"Piscinas Municipais de Setúbal", tipo:"piscina", municipio:"Setúbal" },
   ];
 
   const VITIMAS = [
@@ -956,8 +1340,8 @@
     { idade:"18 anos",  sexo:"feminino",  tipo:"adulto"     },
     { idade:"20 anos",  sexo:"masculino", tipo:"adulto"     },
     { idade:"22 anos",  sexo:"feminino",  tipo:"adulto"     },
-    { idade:"25 anos",  sexo:"feminino",  tipo:"adulto", especial:"grávida" },
-    { idade:"28 anos",  sexo:"feminino",  tipo:"adulto", especial:"grávida" },
+    { idade:"25 anos",  sexo:"feminino",  tipo:"adulto" },
+    { idade:"28 anos",  sexo:"feminino",  tipo:"adulto" },
     { idade:"30 anos",  sexo:"masculino", tipo:"adulto"     },
     { idade:"35 anos",  sexo:"feminino",  tipo:"adulto"     },
     { idade:"40 anos",  sexo:"masculino", tipo:"adulto"     },
@@ -970,23 +1354,107 @@
     { idade:"72 anos",  sexo:"feminino",  tipo:"adulto"     },
     { idade:"75 anos",  sexo:"masculino", tipo:"adulto"     },
     { idade:"78 anos",  sexo:"feminino",  tipo:"adulto"     },
-    { idade:"80 anos",  sexo:"masculino", tipo:"adulto", especial:"O\u2082 domiciliário" },
-    { idade:"83 anos",  sexo:"feminino",  tipo:"adulto", especial:"O\u2082 domiciliário" },
+    { idade:"80 anos",  sexo:"masculino", tipo:"adulto" },
+    { idade:"83 anos",  sexo:"feminino",  tipo:"adulto" },
     { idade:"85 anos",  sexo:"masculino", tipo:"adulto"     },
   ];
+
+  // Condições especiais: independentes do tipo de vítima; "serve" diz a quem se podem aplicar
+  const idadeNum = v => parseInt(v.idade, 10);
+  const CONDICOES = [
+    { nome: "grávida",             serve: v => v.tipo==="adulto" && v.sexo==="feminino" && idadeNum(v) >= 18 && idadeNum(v) <= 40 },
+    { nome: "O\u2082 domiciliário", comDebito: true, serve: v => v.tipo==="adulto" && idadeNum(v) >= 65 },
+  ];
+
+  // Cenários: todos incluem PCR. Os 3 de base estão sempre ativos; Trauma e Obstrução são acrescentados pelo utilizador.
+  const CENARIOS_BASE = [
+    { id:"sem-resposta", variantes:[
+      { titulo:"Vítima inconsciente e sem resposta", desc:"A vítima é encontrada inconsciente, sem resposta nem reação, e está em PCR." } ] },
+    { id:"dif-resp", variantes:[
+      { titulo:"PCR após dificuldade respiratória", desc:"A vítima tem dificuldade em respirar e evolui para PCR." } ] },
+    { id:"agua", variantes:[
+      { titulo:"Vítima retirada da água, inconsciente e sem resposta", desc:"A vítima é retirada da água inconsciente, sem resposta nem reação, e está em PCR." } ],
+      // trauma como agravante (só entra se "Trauma" estiver ativo)
+      comTrauma:[
+      { titulo:"Vítima retirada da água com trauma, inconsciente e sem resposta", desc:"A vítima é retirada da água com trauma associado, inconsciente e sem resposta, e está em PCR." } ] },
+  ];
+  const CENARIOS_EXTRA = [
+    // substitui o início do cenário
+    { id:"obstrucao", icon:"🚫", label:"Obstrução da via aérea", variantes:[
+      { titulo:"PCR após obstrução da via aérea", desc:"Obstrução da via aérea que evolui para PCR." } ] },
+    // pode ser o início do cenário (ou agravante, na vítima retirada da água)
+    { id:"trauma", icon:"🤕", label:"Trauma", variantes:[
+      { titulo:"PCR após trauma", desc:"A vítima sofre um trauma e entra em PCR." },
+      { titulo:"PCR antes de trauma", desc:"A vítima entra em PCR e sofre um trauma (por exemplo, numa queda)." } ] },
+  ];
+  // Kit de oxigenoterapia: pesos relativos (50 / 30 / 20)
+  const KITS = [
+    { id:"disponivel",    icon:"✅", label:"Disponível",    texto:"Disponível",                      peso:50 },
+    { id:"apos-reversao", icon:"⏳", label:"Após reversão", texto:"Disponível após reversão da PCR", peso:30 },
+    { id:"indisponivel",  icon:"❌", label:"Indisponível",  texto:"Indisponível",                    peso:20 },
+  ];
+  const pickWeighted = arr => {
+    let r = Math.random() * arr.reduce((a,x) => a + x.peso, 0);
+    for (const x of arr) { if ((r -= x.peso) < 0) return x; }
+    return arr[arr.length-1];
+  };
+
+  function SbvChips({ items, selected, onToggle }) {
+    return (
+      <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+        {items.map(it => {
+          const on = selected.includes(it.id);
+          return (
+            <div key={it.id} onClick={() => onToggle(it.id)} className={"sbv-toggle"+(on?" on":"")}>
+              <div className="sbv-checkbox">
+                {on && <span style={{color:"white",fontSize:"0.65rem",fontWeight:800}}>✓</span>}
+              </div>
+              <span style={{fontSize:"0.82rem",fontWeight:700,color:on?"#93C5FD":"#4A7FA5"}}>{it.icon} {it.label}</span>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
 
   function ScenarioGenerator({ onBack }) {
     const [vitima,  setVitima]  = useState(null);
     const [local,   setLocal]   = useState(null);
     const [tipos,   setTipos]   = useState(["adulto","pediatrico","lactente"]);
+    const [condicoes, setCondicoes] = useState(false);
+    const [extras, setExtras] = useState([]);   // "trauma" e/ou "obstrucao"
+    const [kits, setKits] = useState(KITS.map(k => k.id));
+    const [cenario, setCenario] = useState(null);
+    const [kit, setKit] = useState(null);
+    const toggleIn = setter => id => setter(s => s.includes(id) ? s.filter(x => x!==id) : [...s, id]);
+    // probabilidades efetivas do kit (pesos 50/30/20, mantendo a proporção entre as opções ativas)
+    const kitAtivos = KITS.filter(k => kits.includes(k.id));
+    const kitTotal = kitAtivos.reduce((a,k) => a + k.peso, 0);
+    const fmtPct = n => (Math.round(n*10)/10).toString().replace(".", ",") + "%";
 
     const toggleTipo = t => setTipos(s => s.includes(t) ? s.filter(x=>x!==t) : [...s,t]);
 
+    const PROB_CONDICAO = 0.2; // com o botão ligado: 20% de a vítima ter condição especial
     const generate = () => {
-      const pool = VITIMAS.filter(v => tipos.includes(v.tipo));
-      if (!pool.length) return;
-      setVitima(pick(pool));
+      const base = VITIMAS.filter(v => tipos.includes(v.tipo));
+      if (!base.length || !kits.length) return;
+      const elegiveis = base.filter(v => CONDICOES.some(c => c.serve(v)));
+      let v, especial = null;
+      if (condicoes && elegiveis.length && Math.random() < PROB_CONDICAO) {
+        v = pick(elegiveis);
+        const cond = pick(CONDICOES.filter(c => c.serve(v)));
+        especial = cond.comDebito ? cond.nome + " — " + (2 + Math.floor(Math.random()*5)) + " l/min" : cond.nome;
+      } else {
+        v = pick(base);
+      }
+      setVitima({ ...v, especial });
       setLocal(pick(LOCAIS));
+      const comTrauma = extras.includes("trauma");
+      // cada cenário individual tem o mesmo peso
+      const todos = [...CENARIOS_BASE, ...CENARIOS_EXTRA.filter(c => extras.includes(c.id))]
+        .flatMap(c => comTrauma && c.comTrauma ? [...c.variantes, ...c.comTrauma] : c.variantes);
+      setCenario(pick(todos));
+      setKit(pickWeighted(KITS.filter(k => kits.includes(k.id))));
     };
 
     const TIPO_LABELS = [
@@ -1020,18 +1488,46 @@
           </div>
         </div>
 
+        {/* Condições especiais */}
+        <div style={{marginBottom:20}}>
+          <div style={{fontSize:"0.72rem",color:"#4A7FA5",fontWeight:700,textTransform:"uppercase",letterSpacing:"1px",marginBottom:10}}>Condições especiais</div>
+          <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+            <div onClick={() => setCondicoes(c => !c)} className={"sbv-toggle"+(condicoes?" on":"")}>
+              <div className="sbv-checkbox">
+                {condicoes && <span style={{color:"white",fontSize:"0.65rem",fontWeight:800}}>✓</span>}
+              </div>
+              <span style={{fontSize:"0.82rem",fontWeight:700,color:condicoes?"#93C5FD":"#4A7FA5"}}>⚠️ Permitir condição especial</span>
+            </div>
+          </div>
+          <div style={{fontSize:"0.75rem",color:"var(--muted)",marginTop:8,lineHeight:1.4}}>Gravidez ou O₂ domiciliário (só em adultos). Quando ativo, a vítima gerada pode ter uma, com 20% de probabilidade.</div>
+        </div>
+
+        {/* Cenário */}
+        <div style={{marginBottom:20}}>
+          <div style={{fontSize:"0.72rem",color:"#4A7FA5",fontWeight:700,textTransform:"uppercase",letterSpacing:"1px",marginBottom:10}}>Cenário</div>
+          <SbvChips items={CENARIOS_EXTRA} selected={extras} onToggle={toggleIn(setExtras)} />
+          <div style={{fontSize:"0.75rem",color:"var(--muted)",marginTop:8,lineHeight:1.4}}>Todos incluem PCR. «Vítima inconsciente e sem resposta», «Dificuldade respiratória» e «Vítima retirada da água» estão sempre ativos. Podes acrescentar Trauma (início do cenário ou agravante na vítima retirada da água) e Obstrução da via aérea (substitui o início do cenário). O programa sorteia.</div>
+        </div>
+
+        {/* Kit de oxigenoterapia */}
+        <div style={{marginBottom:20}}>
+          <div style={{fontSize:"0.72rem",color:"#4A7FA5",fontWeight:700,textTransform:"uppercase",letterSpacing:"1px",marginBottom:10}}>Kit de oxigenoterapia</div>
+          <SbvChips items={KITS} selected={kits} onToggle={toggleIn(setKits)} />
+          <div style={{fontSize:"0.75rem",color:"var(--muted)",marginTop:8,lineHeight:1.4}}>{kitAtivos.length ? "Probabilidades: " + kitAtivos.map(k => k.label.toLowerCase() + " " + fmtPct(k.peso/kitTotal*100)).join(" · ") : "Seleciona pelo menos uma opção."}</div>
+        </div>
+
         <button className="btn btn-blue" style={{width:"100%",padding:"15px",fontSize:"1rem",marginBottom:24,borderRadius:"var(--radius)"}}
-          onClick={generate} disabled={tipos.length===0}>
+          onClick={generate} disabled={tipos.length===0 || kits.length===0}>
           🎲 Gerar Vítima
         </button>
 
-        {vitima && local && (
+        {vitima && local && cenario && kit && (
           <>
             {/* Local — full width */}
             <div className="sbv-info-card-full">
               <div className="sbv-info-label">📍 Local</div>
               <div className="sbv-info-value">{local.nome} ({local.municipio})</div>
-              <div style={{fontSize:"0.75rem",color:"var(--muted)",marginTop:4,textTransform:"capitalize"}}>Praia {local.tipo}</div>
+              <div style={{fontSize:"0.75rem",color:"var(--muted)",marginTop:4}}>{TIPO_LOCAL[local.tipo]}</div>
             </div>
 
             {/* Sexo + Idade side by side */}
@@ -1045,6 +1541,19 @@
                 <div className="sbv-info-value">{vitima.idade}</div>
                 {vitima.especial && <div style={{fontSize:"0.75rem",color:"var(--amber)",marginTop:4}}>⚠️ {vitima.especial}</div>}
               </div>
+            </div>
+
+            {/* Cenário */}
+            <div className="sbv-info-card-full">
+              <div className="sbv-info-label">🎬 Cenário</div>
+              <div className="sbv-info-value">{cenario.titulo}</div>
+              <div style={{fontSize:"0.75rem",color:"var(--muted)",marginTop:4,lineHeight:1.4}}>{cenario.desc}</div>
+            </div>
+
+            {/* Kit de oxigenoterapia */}
+            <div className="sbv-info-card-full" style={{marginBottom:16}}>
+              <div className="sbv-info-label">🫁 Kit de oxigenoterapia</div>
+              <div className="sbv-info-value">{kit.texto}</div>
             </div>
           </>
         )}
